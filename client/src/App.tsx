@@ -34,6 +34,7 @@ function App() {
           <Route path="dashboard" element={<DashboardHomePage />} />
           <Route path="dashboard/links" element={<DashboardLinksPage />} />
           <Route path="dashboard/analytics" element={<DashboardAnalyticsPage />} />
+          <Route path="dashboard/analytics/:id" element={<DashboardAnalyticsPage />} />
           <Route path="dashboard/settings" element={<DashboardSettingsPage />} />
           <Route path="dashboard/profile" element={<DashboardProfilePage />} />
         </Route>
