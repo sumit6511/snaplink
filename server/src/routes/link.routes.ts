@@ -11,6 +11,7 @@ export const linkRouter = Router();
 
 linkRouter.post('/', validate(createLinkSchema), linkController.create);
 linkRouter.get('/', validate(listLinksQuerySchema, 'query'), linkController.list);
+linkRouter.get('/stats/summary', linkController.stats);
 linkRouter.get('/:id', linkController.getById);
 linkRouter.put('/:id', validate(updateLinkSchema), linkController.update);
 linkRouter.delete('/:id', linkController.remove);

@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { FilterQuery } from 'mongoose';
+import { FilterQuery, Types } from 'mongoose';
 import { env } from '../config/env';
 import { ClickEvent } from '../models/ClickEvent.model';
 import { ILink, Link, LinkDocument } from '../models/Link.model';
@@ -113,4 +113,41 @@ export async function deleteLink(ownerId: string, linkId: string): Promise<void>
   const link = await getOwnedLink(ownerId, linkId);
   await ClickEvent.deleteMany({ link: link._id });
   await link.deleteOne();
+}
+
+export interface LinkStats {
+  totalLinks: number;
+  totalClicks: number;
+  activeLinks: number;
+  expiredLinks: number;
+}
+
+export async function getLinkStats(ownerId: string): Promise<LinkStats> {
+  const now = new Date();
+
+  const [result] = await Link.aggregate<{
+    totalLinks: number;
+    totalClicks: number;
+    expiredLinks: number;
+  }>([
+    { $match: { owner: new Types.ObjectId(ownerId) } },
+    {
+      $group: {
+        _id: null,
+        totalLinks: { $sum: 1 },
+        totalClicks: { $sum: '$clicks' },
+        expiredLinks: {
+          $sum: {
+            $cond: [{ $and: [{ $ne: ['$expiresAt', null] }, { $lt: ['$expiresAt', now] }] }, 1, 0],
+          },
+        },
+      },
+    },
+  ]);
+
+  const totalLinks = result?.totalLinks ?? 0;
+  const totalClicks = result?.totalClicks ?? 0;
+  const expiredLinks = result?.expiredLinks ?? 0;
+
+  return { totalLinks, totalClicks, expiredLinks, activeLinks: totalLinks - expiredLinks };
 }

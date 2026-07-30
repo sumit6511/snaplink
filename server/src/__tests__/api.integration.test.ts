@@ -103,6 +103,19 @@ describe('SnapLink API', () => {
     expect(res.body.data.pagination.total).toBe(1);
   });
 
+  it('returns aggregate link stats for the owner', async () => {
+    const res = await request(app)
+      .get('/api/links/stats/summary')
+      .set('Authorization', `Bearer ${accessToken}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({
+      totalLinks: 1,
+      totalClicks: 0,
+      activeLinks: 1,
+      expiredLinks: 0,
+    });
+  });
+
   it('updates the link with a custom alias', async () => {
     const res = await request(app)
       .put(`/api/links/${linkId}`)

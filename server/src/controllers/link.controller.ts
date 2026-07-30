@@ -28,3 +28,8 @@ export const remove = catchAsync(async (req: Request, res: Response) => {
   await linkService.deleteLink(req.userId!, req.params.id);
   res.status(204).send();
 });
+
+export const stats = catchAsync(async (req: Request, res: Response) => {
+  const data = await linkService.getLinkStats(req.userId!);
+  res.status(200).json({ success: true, data });
+});

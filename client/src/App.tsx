@@ -1,9 +1,14 @@
 import { Route, Routes } from 'react-router-dom';
 import { GuestRoute } from '@/components/GuestRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { AboutPage } from '@/pages/AboutPage';
-import { DashboardPage } from '@/pages/DashboardPage';
+import { DashboardAnalyticsPage } from '@/pages/dashboard/DashboardAnalyticsPage';
+import { DashboardHomePage } from '@/pages/dashboard/DashboardHomePage';
+import { DashboardLinksPage } from '@/pages/dashboard/DashboardLinksPage';
+import { DashboardProfilePage } from '@/pages/dashboard/DashboardProfilePage';
+import { DashboardSettingsPage } from '@/pages/dashboard/DashboardSettingsPage';
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
@@ -25,7 +30,13 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route path="dashboard" element={<DashboardPage />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="dashboard" element={<DashboardHomePage />} />
+          <Route path="dashboard/links" element={<DashboardLinksPage />} />
+          <Route path="dashboard/analytics" element={<DashboardAnalyticsPage />} />
+          <Route path="dashboard/settings" element={<DashboardSettingsPage />} />
+          <Route path="dashboard/profile" element={<DashboardProfilePage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
