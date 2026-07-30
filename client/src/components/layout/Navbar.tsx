@@ -3,9 +3,10 @@ import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { buttonClasses } from '@/utils/buttonVariants';
 import { Container } from '@/components/ui/Container';
 import { Logo } from '@/components/ui/Logo';
+import { useAuth } from '@/context/AuthContext';
+import { buttonClasses } from '@/utils/buttonVariants';
 import { cn } from '@/utils/cn';
 
 const NAV_LINKS = [
@@ -16,6 +17,8 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { status, logout } = useAuth();
+  const isAuthenticated = status === 'authenticated';
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/80 backdrop-blur-lg dark:border-gray-800/70 dark:bg-gray-950/80">
@@ -42,12 +45,29 @@ export function Navbar() {
 
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          <NavLink to="/login" className={buttonClasses('ghost', 'sm')}>
-            Log in
-          </NavLink>
-          <NavLink to="/register" className={buttonClasses('primary', 'sm')}>
-            Get started
-          </NavLink>
+          {isAuthenticated ? (
+            <>
+              <NavLink to="/dashboard" className={buttonClasses('ghost', 'sm')}>
+                Dashboard
+              </NavLink>
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className={buttonClasses('outline', 'sm')}
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login" className={buttonClasses('ghost', 'sm')}>
+                Log in
+              </NavLink>
+              <NavLink to="/register" className={buttonClasses('primary', 'sm')}>
+                Get started
+              </NavLink>
+            </>
+          )}
         </div>
 
         <button
@@ -83,20 +103,44 @@ export function Navbar() {
               ))}
               <div className="mt-2 flex items-center gap-2 border-t border-gray-200 pt-4 dark:border-gray-800">
                 <ThemeToggle />
-                <NavLink
-                  to="/login"
-                  onClick={() => setOpen(false)}
-                  className={buttonClasses('outline', 'sm', 'flex-1')}
-                >
-                  Log in
-                </NavLink>
-                <NavLink
-                  to="/register"
-                  onClick={() => setOpen(false)}
-                  className={buttonClasses('primary', 'sm', 'flex-1')}
-                >
-                  Get started
-                </NavLink>
+                {isAuthenticated ? (
+                  <>
+                    <NavLink
+                      to="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className={buttonClasses('ghost', 'sm', 'flex-1')}
+                    >
+                      Dashboard
+                    </NavLink>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpen(false);
+                        void logout();
+                      }}
+                      className={buttonClasses('outline', 'sm', 'flex-1')}
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <NavLink
+                      to="/login"
+                      onClick={() => setOpen(false)}
+                      className={buttonClasses('outline', 'sm', 'flex-1')}
+                    >
+                      Log in
+                    </NavLink>
+                    <NavLink
+                      to="/register"
+                      onClick={() => setOpen(false)}
+                      className={buttonClasses('primary', 'sm', 'flex-1')}
+                    >
+                      Get started
+                    </NavLink>
+                  </>
+                )}
               </div>
             </Container>
           </motion.div>

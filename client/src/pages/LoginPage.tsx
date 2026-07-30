@@ -1,13 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useAuth } from '@/context/AuthContext';
+import { getErrorMessage } from '@/utils/errorMessage';
 import { loginSchema, type LoginFormValues } from '@/validators/auth';
 
 export function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -18,10 +23,13 @@ export function LoginPage() {
 
   const onSubmit = async (values: LoginFormValues) => {
     setFormError(null);
-    // Wired up to POST /api/auth/login in the next milestone (auth context +
-    // protected routes). For now this validates and simulates the request.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    console.info('Login submitted', values);
+    try {
+      await login(values.email, values.password);
+      const redirectTo = (location.state as { from?: string } | null)?.from ?? '/dashboard';
+      navigate(redirectTo, { replace: true });
+    } catch (error) {
+      setFormError(getErrorMessage(error, 'Invalid email or password.'));
+    }
   };
 
   return (

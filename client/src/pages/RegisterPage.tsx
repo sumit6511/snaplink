@@ -1,13 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '@/components/layout/AuthLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useAuth } from '@/context/AuthContext';
+import { getErrorMessage } from '@/utils/errorMessage';
 import { registerSchema, type RegisterFormValues } from '@/validators/auth';
 
 export function RegisterPage() {
+  const { register: registerUser } = useAuth();
+  const navigate = useNavigate();
   const [formError, setFormError] = useState<string | null>(null);
 
   const {
@@ -18,10 +22,12 @@ export function RegisterPage() {
 
   const onSubmit = async (values: RegisterFormValues) => {
     setFormError(null);
-    // Wired up to POST /api/auth/register in the next milestone (auth
-    // context + protected routes). For now this validates and simulates.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    console.info('Register submitted', values);
+    try {
+      await registerUser(values.name, values.email, values.password);
+      navigate('/dashboard', { replace: true });
+    } catch (error) {
+      setFormError(getErrorMessage(error, 'Could not create your account.'));
+    }
   };
 
   return (
