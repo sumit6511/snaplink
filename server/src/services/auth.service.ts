@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+import { BCRYPT_SALT_ROUNDS } from '../config/constants';
 import { User, UserDocument } from '../models/User.model';
 import { AppError } from '../utils/AppError';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
@@ -8,6 +10,12 @@ interface AuthResult {
   accessToken: string;
   refreshToken: string;
 }
+
+// A hash with no matching plaintext, compared against when no user is found
+// so a login attempt always pays bcrypt's cost. Without this, "no such
+// user" returns near-instantly while a real password check takes ~100ms,
+// letting an attacker enumerate registered emails purely from response time.
+const DUMMY_HASH = bcrypt.hashSync('snaplink-dummy-password-for-timing-safety', BCRYPT_SALT_ROUNDS);
 
 export async function registerUser(input: RegisterInput): Promise<AuthResult> {
   const existing = await User.findOne({ email: input.email }).lean();
@@ -26,12 +34,12 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
 
 export async function loginUser(input: LoginInput): Promise<AuthResult> {
   const user = await User.findOne({ email: input.email }).select('+password');
-  if (!user) {
-    throw AppError.unauthorized('Invalid email or password');
-  }
 
-  const isMatch = await user.comparePassword(input.password);
-  if (!isMatch) {
+  const isMatch = user
+    ? await user.comparePassword(input.password)
+    : await bcrypt.compare(input.password, DUMMY_HASH);
+
+  if (!user || !isMatch) {
     throw AppError.unauthorized('Invalid email or password');
   }
 

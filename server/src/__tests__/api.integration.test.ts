@@ -94,6 +94,14 @@ describe('SnapLink API', () => {
     expect(res.status).toBe(400);
   });
 
+  it('rejects non-http(s) URL schemes', async () => {
+    const res = await request(app)
+      .post('/api/links')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ originalUrl: 'javascript:alert(1)' });
+    expect(res.status).toBe(400);
+  });
+
   it("lists the owner's links with pagination", async () => {
     const res = await request(app)
       .get('/api/links?page=1&limit=10')
