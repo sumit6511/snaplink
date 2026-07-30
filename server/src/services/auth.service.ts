@@ -1,0 +1,67 @@
+import { User, UserDocument } from '../models/User.model';
+import { AppError } from '../utils/AppError';
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
+import { LoginInput, RegisterInput } from '../validators/auth.validator';
+
+interface AuthResult {
+  user: UserDocument;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export async function registerUser(input: RegisterInput): Promise<AuthResult> {
+  const existing = await User.findOne({ email: input.email }).lean();
+  if (existing) {
+    throw AppError.conflict('An account with this email already exists');
+  }
+
+  const user = await User.create(input);
+
+  return {
+    user,
+    accessToken: signAccessToken(user.id),
+    refreshToken: signRefreshToken(user.id),
+  };
+}
+
+export async function loginUser(input: LoginInput): Promise<AuthResult> {
+  const user = await User.findOne({ email: input.email }).select('+password');
+  if (!user) {
+    throw AppError.unauthorized('Invalid email or password');
+  }
+
+  const isMatch = await user.comparePassword(input.password);
+  if (!isMatch) {
+    throw AppError.unauthorized('Invalid email or password');
+  }
+
+  return {
+    user,
+    accessToken: signAccessToken(user.id),
+    refreshToken: signRefreshToken(user.id),
+  };
+}
+
+export async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
+  let payload;
+  try {
+    payload = verifyRefreshToken(refreshToken);
+  } catch {
+    throw AppError.unauthorized('Invalid or expired session. Please log in again.');
+  }
+
+  const user = await User.findById(payload.sub).lean();
+  if (!user) {
+    throw AppError.unauthorized('User no longer exists');
+  }
+
+  return { accessToken: signAccessToken(payload.sub) };
+}
+
+export async function getUserProfile(userId: string): Promise<UserDocument> {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw AppError.notFound('User not found');
+  }
+  return user;
+}

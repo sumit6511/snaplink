@@ -1,9 +1,15 @@
 import { Router } from 'express';
+import { protect } from '../middleware/auth';
+import { analyticsRouter } from './analytics.routes';
+import { authRouter } from './auth.routes';
 import { healthRouter } from './health.routes';
+import { linkRouter } from './link.routes';
+import { userRouter } from './user.routes';
 
 export const apiRouter = Router();
 
 apiRouter.use('/health', healthRouter);
-
-// Additional routers (auth, user, links, analytics) are mounted here as
-// each feature is implemented.
+apiRouter.use('/auth', authRouter);
+apiRouter.use('/user', userRouter);
+apiRouter.use('/links', protect, linkRouter);
+apiRouter.use('/analytics', protect, analyticsRouter);

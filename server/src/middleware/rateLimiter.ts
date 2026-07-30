@@ -17,3 +17,14 @@ export const authLimiter = rateLimit({
   skipSuccessfulRequests: true,
   message: { success: false, message: 'Too many attempts, please try again later.' },
 });
+
+// Redirects legitimately see much higher traffic than the REST API (viral
+// links, link-preview bots), so this stays generous — it only guards
+// against short-code enumeration/scraping, not normal click volume.
+export const redirectLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again shortly.' },
+});
