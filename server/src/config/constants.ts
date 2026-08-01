@@ -12,3 +12,8 @@ export const PAGINATION_DEFAULTS = {
   limit: 10,
   maxLimit: 100,
 };
+
+// Expired links already stop redirecting immediately (redirect.service checks
+// isExpired), so this only controls how long their data sticks around for the
+// owner to still see analytics on a recently-expired link before it's purged.
+export const LINK_EXPIRY_GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000;

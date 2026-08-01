@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "cleanup:links": "tsx src/jobs/runCleanupOnce.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -31,6 +32,7 @@
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
     "nanoid": "^3.3.8",
+    "node-cron": "^4.6.0",
     "qrcode": "^1.5.4",
     "ua-parser-js": "^1.0.40",
     "winston": "^3.17.0",
@@ -46,6 +48,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.5",
+    "@types/node-cron": "^3.0.11",
     "@types/qrcode": "^1.5.5",
     "@types/supertest": "^7.2.1",
     "@types/ua-parser-js": "^0.7.39",

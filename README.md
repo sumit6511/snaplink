@@ -25,6 +25,7 @@ click history) for every link you create.
 - [API documentation](#api-documentation)
 - [Security](#security)
 - [Deployment](#deployment)
+- [Background jobs](#background-jobs)
 - [Future improvements](#future-improvements)
 
 ## Overview
@@ -129,8 +130,9 @@ snaplink/
 │   │   ├── services/                  # Business logic (auth, link, redirect, analytics)
 │   │   ├── controllers/                # Thin request/response glue
 │   │   ├── routes/                      # Route wiring
-│   │   ├── utils/                        # AppError, catchAsync, jwt, qrcode, ...
-│   │   └── __tests__/                     # Vitest + Supertest integration suite
+│   │   ├── jobs/                         # Scheduled/standalone cleanup job
+│   │   ├── utils/                         # AppError, catchAsync, jwt, qrcode, ...
+│   │   └── __tests__/                      # Vitest + Supertest integration suite
 │   └── Dockerfile
 ├── docker-compose.yml
 └── .github/workflows/ci.yml
@@ -236,6 +238,8 @@ redirect itself, which is intentionally at the root so links stay short.
 | POST   | `/api/auth/refresh`        | Refresh cookie | Mint a new access token                                             |
 | POST   | `/api/auth/logout`         | —              | Clear the refresh cookie                                            |
 | GET    | `/api/user/profile`        | Bearer token   | Current user's profile                                              |
+| PUT    | `/api/user/profile`        | Bearer token   | Update name/email                                                   |
+| PUT    | `/api/user/password`       | Bearer token   | Change password (requires the current one)                          |
 | POST   | `/api/links`               | Bearer token   | Create a short link                                                 |
 | GET    | `/api/links`               | Bearer token   | List your links (`?page&limit&search`)                              |
 | GET    | `/api/links/stats/summary` | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
@@ -315,12 +319,32 @@ etc.) — same environment variables, just supplied as container config instead 
 platform dashboard, and pointing each service's env vars at the others' public URLs
 instead of the Compose network's service names.
 
+## Background jobs
+
+A short link stops redirecting the instant it expires (`redirect.service` checks this
+on every lookup), but the expired link and its click history otherwise sit in the
+database indefinitely. The cleanup job (`server/src/jobs/cleanupExpiredLinks.job.ts`)
+purges links (and their `ClickEvent`s) once they're 30 days past expiration — a grace
+period so a link that expired yesterday doesn't vanish from the owner's analytics
+before they've had a chance to look at it.
+
+It runs two ways:
+
+- **In-process**, on a daily `node-cron` schedule (`server/src/jobs/scheduler.ts`),
+  started from `server.ts`. This is enough for Docker Compose or any deploy where the
+  API process stays alive continuously.
+- **As a standalone script** — `npm run cleanup:links --workspace=server` (or
+  `node dist/jobs/runCleanupOnce.js` after building) connects to MongoDB, runs one
+  cleanup pass, and exits. Use this from an external scheduler (a Render Cron Job, a
+  scheduled GitHub Actions workflow) on a platform where the web process can sleep
+  between requests — Render's free tier does this, so its in-process `node-cron`
+  schedule isn't guaranteed to fire.
+
 ## Future improvements
 
 Not implemented yet, in roughly the order they'd add the most value:
 
 - Password reset and email verification
-- A scheduled job to purge (or archive) expired links and their click history
 - Bulk URL import and CSV export of links/analytics
 - Custom domains per account
 - PWA support (offline shell, installability)
