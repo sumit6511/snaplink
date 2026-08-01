@@ -14,7 +14,7 @@
     "build": "npm run build -w server && npm run build -w client",
     "lint": "npm run lint -w server && npm run lint -w client",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\" --ignore-path .gitignore",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",
