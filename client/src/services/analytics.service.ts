@@ -5,3 +5,8 @@ export async function getLinkAnalyticsRequest(linkId: string): Promise<LinkAnaly
   const { data } = await api.get<{ data: LinkAnalytics }>(`/analytics/${linkId}`);
   return data.data;
 }
+
+export async function exportClickHistoryCsvRequest(linkId: string): Promise<Blob> {
+  const { data } = await api.get<Blob>(`/analytics/${linkId}/export`, { responseType: 'blob' });
+  return data;
+}

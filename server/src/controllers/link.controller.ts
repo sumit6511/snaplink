@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as linkService from '../services/link.service';
 import { catchAsync } from '../utils/catchAsync';
-import { ListLinksQuery } from '../validators/link.validator';
+import { ExportLinksQuery, ListLinksQuery } from '../validators/link.validator';
 
 export const create = catchAsync(async (req: Request, res: Response) => {
   const link = await linkService.createLink(req.userId!, req.body);
@@ -32,4 +32,16 @@ export const remove = catchAsync(async (req: Request, res: Response) => {
 export const stats = catchAsync(async (req: Request, res: Response) => {
   const data = await linkService.getLinkStats(req.userId!);
   res.status(200).json({ success: true, data });
+});
+
+export const exportCsv = catchAsync(async (req: Request, res: Response) => {
+  const { search } = req.query as unknown as ExportLinksQuery;
+  const csv = await linkService.exportLinksCsv(req.userId!, search);
+  const date = new Date().toISOString().slice(0, 10);
+
+  res
+    .status(200)
+    .header('Content-Type', 'text/csv; charset=utf-8')
+    .header('Content-Disposition', `attachment; filename="snaplink-links-${date}.csv"`)
+    .send(csv);
 });

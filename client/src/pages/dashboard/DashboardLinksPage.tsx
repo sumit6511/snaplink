@@ -1,4 +1,4 @@
-import { BarChart3, Pencil, PlusCircle, QrCode, Search, Trash2 } from 'lucide-react';
+import { BarChart3, Download, Pencil, PlusCircle, QrCode, Search, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { CopyButton } from '@/components/dashboard/CopyButton';
@@ -13,7 +13,9 @@ import { Pagination } from '@/components/ui/Pagination';
 import { Spinner } from '@/components/ui/Spinner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useDeleteLink, useLinks } from '@/hooks/useLinks';
+import { exportLinksCsvRequest } from '@/services/link.service';
 import type { Link } from '@/types/link';
+import { downloadBlob } from '@/utils/downloadBlob';
 import { formatDate, formatNumber } from '@/utils/format';
 import { getShortUrl, getShortUrlDisplay } from '@/utils/shortLink';
 
@@ -28,6 +30,7 @@ export function DashboardLinksPage() {
   const [editingLink, setEditingLink] = useState<Link | null>(null);
   const [qrLink, setQrLink] = useState<Link | null>(null);
   const [deletingLink, setDeletingLink] = useState<Link | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data, isLoading, isError } = useLinks({
     page,
@@ -35,6 +38,16 @@ export function DashboardLinksPage() {
     search: debouncedSearch || undefined,
   });
   const deleteMutation = useDeleteLink();
+
+  const exportCsv = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await exportLinksCsvRequest(debouncedSearch || undefined);
+      downloadBlob(blob, `snaplink-links-${new Date().toISOString().slice(0, 10)}.csv`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const openCreate = () => {
     setEditingLink(null);
@@ -61,10 +74,16 @@ export function DashboardLinksPage() {
             Create, search, and manage all of your shortened links.
           </p>
         </div>
-        <Button onClick={openCreate}>
-          <PlusCircle className="size-4" />
-          New link
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={() => void exportCsv()} isLoading={isExporting}>
+            <Download className="size-4" />
+            Export CSV
+          </Button>
+          <Button onClick={openCreate}>
+            <PlusCircle className="size-4" />
+            New link
+          </Button>
+        </div>
       </div>
 
       <Card className="p-6">

@@ -4,6 +4,7 @@ import { env } from '../config/env';
 import { ClickEvent } from '../models/ClickEvent.model';
 import { ILink, Link, LinkDocument } from '../models/Link.model';
 import { AppError } from '../utils/AppError';
+import { toCsv } from '../utils/csv';
 import { escapeRegExp } from '../utils/escapeRegExp';
 import { generateQrCodeDataUrl } from '../utils/qrcode';
 import { CreateLinkInput, ListLinksQuery, UpdateLinkInput } from '../validators/link.validator';
@@ -41,14 +42,11 @@ export async function createLink(ownerId: string, input: CreateLinkInput): Promi
   });
 }
 
-export async function listLinks(
-  ownerId: string,
-  query: ListLinksQuery,
-): Promise<Paginated<LinkDocument>> {
+function buildSearchFilter(ownerId: string, search?: string): FilterQuery<ILink> {
   const filter: FilterQuery<ILink> = { owner: ownerId };
 
-  if (query.search) {
-    const regex = new RegExp(escapeRegExp(query.search), 'i');
+  if (search) {
+    const regex = new RegExp(escapeRegExp(search), 'i');
     filter.$or = [
       { originalUrl: regex },
       { title: regex },
@@ -57,6 +55,14 @@ export async function listLinks(
     ];
   }
 
+  return filter;
+}
+
+export async function listLinks(
+  ownerId: string,
+  query: ListLinksQuery,
+): Promise<Paginated<LinkDocument>> {
+  const filter = buildSearchFilter(ownerId, query.search);
   const skip = (query.page - 1) * query.limit;
 
   const [items, total] = await Promise.all([
@@ -150,4 +156,20 @@ export async function getLinkStats(ownerId: string): Promise<LinkStats> {
   const expiredLinks = result?.expiredLinks ?? 0;
 
   return { totalLinks, totalClicks, expiredLinks, activeLinks: totalLinks - expiredLinks };
+}
+
+export async function exportLinksCsv(ownerId: string, search?: string): Promise<string> {
+  const filter = buildSearchFilter(ownerId, search);
+  const links = await Link.find(filter).sort({ createdAt: -1 });
+
+  return toCsv(links, [
+    { header: 'Title', value: (link) => link.title },
+    { header: 'Short URL', value: (link) => buildShortUrl(link) },
+    { header: 'Original URL', value: (link) => link.originalUrl },
+    { header: 'Custom Alias', value: (link) => link.customAlias },
+    { header: 'Clicks', value: (link) => link.clicks },
+    { header: 'Status', value: (link) => (link.isExpired ? 'Expired' : 'Active') },
+    { header: 'Created At', value: (link) => link.createdAt.toISOString() },
+    { header: 'Expires At', value: (link) => link.expiresAt?.toISOString() },
+  ]);
 }

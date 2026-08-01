@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, MousePointerClick, Search } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Download, MousePointerClick, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -6,12 +6,15 @@ import { CategoryBarChart } from '@/components/charts/CategoryBarChart';
 import { CategoryDoughnutChart } from '@/components/charts/CategoryDoughnutChart';
 import { RankedList } from '@/components/charts/RankedList';
 import { TimeSeriesChart } from '@/components/charts/TimeSeriesChart';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useLinkAnalytics } from '@/hooks/useLinkAnalytics';
 import { useLinks } from '@/hooks/useLinks';
+import { exportClickHistoryCsvRequest } from '@/services/analytics.service';
+import { downloadBlob } from '@/utils/downloadBlob';
 import { formatDate, formatDateTime, formatNumber } from '@/utils/format';
 import { getShortUrlDisplay } from '@/utils/shortLink';
 
@@ -82,6 +85,17 @@ function AnalyticsLinkPicker() {
 
 function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
   const { data, isLoading, isError } = useLinkAnalytics(linkId);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportCsv = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await exportClickHistoryCsvRequest(linkId);
+      downloadBlob(blob, `snaplink-analytics-${new Date().toISOString().slice(0, 10)}.csv`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -209,7 +223,20 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
       </Card>
 
       <Card className="p-6">
-        <h2 className="font-semibold text-gray-900 dark:text-white">Click history</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Click history</h2>
+          {clickHistory.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void exportCsv()}
+              isLoading={isExporting}
+            >
+              <Download className="size-4" />
+              Export CSV
+            </Button>
+          )}
+        </div>
         {clickHistory.length === 0 ? (
           <p className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
             No clicks recorded yet.

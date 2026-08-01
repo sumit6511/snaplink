@@ -223,6 +223,32 @@ describe('SnapLink API', () => {
     expect(res.body.data.timeseries.monthly).toHaveLength(12);
   });
 
+  it("exports the owner's links as CSV", async () => {
+    const res = await request(app)
+      .get('/api/links/export')
+      .set('Authorization', `Bearer ${accessToken}`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/^text\/csv/);
+    expect(res.headers['content-disposition']).toMatch(/^attachment; filename="snaplink-links-/);
+    const lines = res.text.trim().split('\r\n');
+    expect(lines[0]).toBe(
+      'Title,Short URL,Original URL,Custom Alias,Clicks,Status,Created At,Expires At',
+    );
+    expect(lines).toHaveLength(2);
+    expect(lines[1]).toContain('ada-link');
+  });
+
+  it("exports the link's click history as CSV", async () => {
+    const res = await request(app)
+      .get(`/api/analytics/${linkId}/export`)
+      .set('Authorization', `Bearer ${accessToken}`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toMatch(/^text\/csv/);
+    const lines = res.text.trim().split('\r\n');
+    expect(lines[0]).toBe('Timestamp,Browser,OS,Device,Country,Referrer');
+    expect(lines).toHaveLength(3);
+  });
+
   it("prevents another user from accessing someone else's link", async () => {
     await request(app).post('/api/auth/register').send({
       name: 'Grace Hopper',
@@ -238,6 +264,11 @@ describe('SnapLink API', () => {
       .get(`/api/links/${linkId}`)
       .set('Authorization', `Bearer ${otherToken}`);
     expect(res.status).toBe(404);
+
+    const analyticsExportRes = await request(app)
+      .get(`/api/analytics/${linkId}/export`)
+      .set('Authorization', `Bearer ${otherToken}`);
+    expect(analyticsExportRes.status).toBe(404);
   });
 
   it('deletes the link', async () => {

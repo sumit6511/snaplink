@@ -53,3 +53,11 @@ export async function updateLinkRequest(id: string, input: UpdateLinkInput): Pro
 export async function deleteLinkRequest(id: string): Promise<void> {
   await api.delete(`/links/${id}`);
 }
+
+export async function exportLinksCsvRequest(search?: string): Promise<Blob> {
+  const { data } = await api.get<Blob>('/links/export', {
+    params: search ? { search } : undefined,
+    responseType: 'blob',
+  });
+  return data;
+}

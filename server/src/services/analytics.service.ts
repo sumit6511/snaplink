@@ -1,4 +1,5 @@
 import { ClickEvent } from '../models/ClickEvent.model';
+import { toCsv } from '../utils/csv';
 import { getOwnedLink } from './link.service';
 
 interface Bucket {
@@ -144,4 +145,20 @@ export async function getLinkAnalytics(ownerId: string, linkId: string) {
     },
     clickHistory: facets.history,
   };
+}
+
+// The in-app click history is capped at 50 rows for the dashboard view; the
+// export has no such cap since the point of exporting is to get the raw data.
+export async function exportClickHistoryCsv(ownerId: string, linkId: string): Promise<string> {
+  const link = await getOwnedLink(ownerId, linkId);
+  const events = await ClickEvent.find({ link: link._id }).sort({ timestamp: -1 });
+
+  return toCsv(events, [
+    { header: 'Timestamp', value: (event) => event.timestamp.toISOString() },
+    { header: 'Browser', value: (event) => event.browser },
+    { header: 'OS', value: (event) => event.os },
+    { header: 'Device', value: (event) => event.device },
+    { header: 'Country', value: (event) => event.country },
+    { header: 'Referrer', value: (event) => event.referrer },
+  ]);
 }

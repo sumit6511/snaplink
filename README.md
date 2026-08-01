@@ -62,6 +62,7 @@ that mirrors the same domain boundaries (services, hooks, typed API contracts).
 - Copy the short link to the clipboard; open it in a new tab
 - Auto-generated QR code per link, downloadable as a PNG
 - Stat cards (total links, total clicks, active/expired) and a recent-links widget
+- CSV export of your links and of a link's full click history
 - Editable profile (name, email) and password change; theme toggle
 
 **Analytics** (per link)
@@ -231,23 +232,25 @@ formatting/URL utilities, and UI components with `@testing-library/react` + jsdo
 All endpoints are JSON over HTTPS and prefixed with `/api`, except the short-link
 redirect itself, which is intentionally at the root so links stay short.
 
-| Method | Endpoint                   | Auth           | Description                                                         |
-| ------ | -------------------------- | -------------- | ------------------------------------------------------------------- |
-| POST   | `/api/auth/register`       | —              | Create an account, returns an access token + sets a refresh cookie  |
-| POST   | `/api/auth/login`          | —              | Log in                                                              |
-| POST   | `/api/auth/refresh`        | Refresh cookie | Mint a new access token                                             |
-| POST   | `/api/auth/logout`         | —              | Clear the refresh cookie                                            |
-| GET    | `/api/user/profile`        | Bearer token   | Current user's profile                                              |
-| PUT    | `/api/user/profile`        | Bearer token   | Update name/email                                                   |
-| PUT    | `/api/user/password`       | Bearer token   | Change password (requires the current one)                          |
-| POST   | `/api/links`               | Bearer token   | Create a short link                                                 |
-| GET    | `/api/links`               | Bearer token   | List your links (`?page&limit&search`)                              |
-| GET    | `/api/links/stats/summary` | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
-| GET    | `/api/links/:id`           | Bearer token   | Get one link (must be owned by the caller)                          |
-| PUT    | `/api/links/:id`           | Bearer token   | Update a link                                                       |
-| DELETE | `/api/links/:id`           | Bearer token   | Delete a link and its click history                                 |
-| GET    | `/api/analytics/:id`       | Bearer token   | Full analytics for one link (breakdowns, timeseries, click history) |
-| GET    | `/:shortCode`              | —              | Resolve a short code/alias and redirect (records a click)           |
+| Method | Endpoint                    | Auth           | Description                                                         |
+| ------ | --------------------------- | -------------- | ------------------------------------------------------------------- |
+| POST   | `/api/auth/register`        | —              | Create an account, returns an access token + sets a refresh cookie  |
+| POST   | `/api/auth/login`           | —              | Log in                                                              |
+| POST   | `/api/auth/refresh`         | Refresh cookie | Mint a new access token                                             |
+| POST   | `/api/auth/logout`          | —              | Clear the refresh cookie                                            |
+| GET    | `/api/user/profile`         | Bearer token   | Current user's profile                                              |
+| PUT    | `/api/user/profile`         | Bearer token   | Update name/email                                                   |
+| PUT    | `/api/user/password`        | Bearer token   | Change password (requires the current one)                          |
+| POST   | `/api/links`                | Bearer token   | Create a short link                                                 |
+| GET    | `/api/links`                | Bearer token   | List your links (`?page&limit&search`)                              |
+| GET    | `/api/links/stats/summary`  | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
+| GET    | `/api/links/export`         | Bearer token   | Export your links as CSV (`?search`)                                |
+| GET    | `/api/links/:id`            | Bearer token   | Get one link (must be owned by the caller)                          |
+| PUT    | `/api/links/:id`            | Bearer token   | Update a link                                                       |
+| DELETE | `/api/links/:id`            | Bearer token   | Delete a link and its click history                                 |
+| GET    | `/api/analytics/:id`        | Bearer token   | Full analytics for one link (breakdowns, timeseries, click history) |
+| GET    | `/api/analytics/:id/export` | Bearer token   | Export the link's full click history as CSV                         |
+| GET    | `/:shortCode`               | —              | Resolve a short code/alias and redirect (records a click)           |
 
 Every mutating endpoint validates its input with Zod and returns `400` with field-level
 errors on failure. Endpoints scoped to a link return `404` (not `403`) when the link
@@ -345,7 +348,7 @@ It runs two ways:
 Not implemented yet, in roughly the order they'd add the most value:
 
 - Password reset and email verification
-- Bulk URL import and CSV export of links/analytics
+- Bulk URL import
 - Custom domains per account
 - PWA support (offline shell, installability)
 - Redis-backed rate limiting (the current in-memory store doesn't share state across

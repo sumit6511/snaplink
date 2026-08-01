@@ -49,6 +49,9 @@ export const listLinksQuerySchema = z.object({
   search: z.string().trim().max(200).optional(),
 });
 
+export const exportLinksQuerySchema = listLinksQuerySchema.pick({ search: true });
+
 export type CreateLinkInput = z.infer<typeof createLinkSchema>;
 export type UpdateLinkInput = z.infer<typeof updateLinkSchema>;
 export type ListLinksQuery = z.infer<typeof listLinksQuerySchema>;
+export type ExportLinksQuery = z.infer<typeof exportLinksQuerySchema>;
