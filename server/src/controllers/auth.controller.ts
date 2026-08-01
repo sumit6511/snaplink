@@ -8,7 +8,13 @@ import { catchAsync } from '../utils/catchAsync';
 const refreshCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  sameSite: 'strict',
+  // Frontend and API are on different domains in production (Vercel vs
+  // Render), so the browser treats every API call as cross-site — a
+  // `strict` (or `lax`) cookie would simply never be sent back, silently
+  // breaking refresh/logout. `none` requires `secure: true`, which is why
+  // this stays tied to the same isProduction check as the line above;
+  // locally, both run on localhost (same site), so `strict` is fine there.
+  sameSite: isProduction ? 'none' : 'strict',
   path: '/api/auth',
   maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
 };
