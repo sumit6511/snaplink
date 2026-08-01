@@ -6,9 +6,7 @@ SnapLink is a full-stack URL shortener: custom aliases, QR codes, link expiratio
 real analytics dashboard (clicks over time, browser/device/OS/country/referrer breakdowns,
 click history) for every link you create.
 
-> Replace the badge URL below with your own repo path once this is pushed to GitHub.
-
-<!-- ![CI](https://github.com/<owner>/<repo>/actions/workflows/ci.yml/badge.svg) -->
+![CI](https://github.com/sumit6511/snaplink/actions/workflows/ci.yml/badge.svg)
 
 ## Table of contents
 
@@ -149,7 +147,7 @@ snaplink/
 ### Installation
 
 ```bash
-git clone <your-repo-url> snaplink
+git clone https://github.com/sumit6511/snaplink.git
 cd snaplink
 npm install
 ```
