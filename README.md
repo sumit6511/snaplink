@@ -253,8 +253,10 @@ exists but belongs to another user, so ownership isn't leaked through the respon
   attempt, including for a nonexistent email, so response timing can't be used to
   enumerate registered accounts.
 - JWT access tokens are short-lived and kept in memory on the client (never
-  `localStorage`); the longer-lived refresh token lives in an httpOnly, `sameSite=strict`
-  cookie scoped to `/api/auth`.
+  `localStorage`); the longer-lived refresh token lives in an httpOnly cookie scoped to
+  `/api/auth`, with `sameSite=strict` in development and `sameSite=none; secure` in
+  production (frontend and API are on different domains in a split deployment, so the
+  browser treats every API call as cross-site — `strict`/`lax` would never be sent back).
 - Helmet, tiered rate limiting (auth/API/redirect), `express-mongo-sanitize`, and `hpp`
   are applied globally.
 - Link URLs are restricted to `http(s)` — Zod's plain URL check would otherwise also
@@ -267,21 +269,49 @@ exists but belongs to another user, so ownership isn't leaked through the respon
 
 ## Deployment
 
-A typical split deployment:
+Live reference deployment: [MongoDB Atlas](https://www.mongodb.com/atlas) (free M0) +
+[Render](https://render.com) (API) + [Vercel](https://vercel.com) (frontend) — all free
+tiers. In dependency order:
 
-- **Frontend** — build (`npm run build --workspace=client`) and deploy the static
-  `client/dist` output to Vercel, Netlify, or Cloudflare Pages. Set `VITE_BACKEND_URL` to
-  your API's public URL at build time.
-- **Backend** — deploy `server/` to Render, Railway, Fly.io, or similar. Set all of the
-  `server/.env` variables above in the platform's dashboard, and point `CLIENT_URL` at
-  your deployed frontend's origin.
-- **Database** — [MongoDB Atlas](https://www.mongodb.com/atlas) free tier is a good fit;
-  the self-hosted `mongo` service in `docker-compose.yml` is meant for local use.
+1. **Database (Atlas)** — create a free cluster, add a database user, allow access from
+   `0.0.0.0/0` (Render's free tier has no static IP), and copy the connection string.
+   Add the database name before the `?`: `.../snaplink?retryWrites=true&w=majority`.
+2. **Backend (Render)** — new Web Service, connect the repo:
+   - Root Directory: `server`
+   - Build Command: `cd .. && npm ci --include=dev && npm run build --workspace=server`
+   - Start Command: `node dist/server.js`
+   - Env vars: everything in the `server/.env` table above, with `MONGODB_URI` from step
+     1, `BASE_URL` set to this service's own Render URL, and `CLIENT_URL` filled in after
+     step 3.
 
-Alternatively, deploy both `Dockerfile`s (client + server) as containers on any platform
-that runs Docker images (Fly.io, Render, a VPS with `docker compose`, etc.), pointing
-each service's env vars at the others' public URLs instead of the Compose network's
-service names.
+   **`--include=dev` is required, not optional.** Render sets `NODE_ENV=production`
+   during the build by default, which makes plain `npm ci` skip devDependencies —
+   including `typescript`, which the build itself needs. (The repo's root
+   `"prepare": "husky || true"` script exists for the same reason: without it, that same
+   devDependency-skipping breaks the install itself, since husky — meaningless outside a
+   local dev checkout anyway — isn't there for npm's auto-run `prepare` step to find.)
+
+3. **Frontend (Vercel)** — new Project, import the repo:
+   - Root Directory: `client`
+   - Framework Preset: Vite (auto-detected)
+   - Env vars: `VITE_BACKEND_URL` = the Render URL from step 2
+
+   Two things this repo already accounts for, worth knowing if you deploy elsewhere:
+   `client/vercel.json` adds the SPA rewrite Vercel needs to serve `index.html` for
+   client-side routes like `/login` or `/dashboard` (without it, every route but `/`
+   404s directly from Vercel, and every page reload would too). And because the frontend
+   and API end up on different domains, `services/api.ts` builds an absolute API base URL
+   from `VITE_BACKEND_URL` instead of the relative `/api` path that only resolves via a
+   proxy (Vite's dev server locally, nginx in Docker Compose) — set that env var for any
+   static host that doesn't proxy `/api` itself.
+
+4. Back in Render, set `CLIENT_URL` to the Vercel URL from step 3 and redeploy — this is
+   what lets CORS accept requests from the live frontend.
+
+Alternatively, both `Dockerfile`s work for a container-based deploy (Fly.io, a VPS,
+etc.) — same environment variables, just supplied as container config instead of a
+platform dashboard, and pointing each service's env vars at the others' public URLs
+instead of the Compose network's service names.
 
 ## Future improvements
 
