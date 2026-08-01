@@ -74,6 +74,69 @@ describe('SnapLink API', () => {
     expect(res.status).toBe(401);
   });
 
+  it('updates the profile name and email', async () => {
+    const res = await request(app)
+      .put('/api/user/profile')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Ada King', email: 'ada.king@example.com' });
+    expect(res.status).toBe(200);
+    expect(res.body.data.user.name).toBe('Ada King');
+    expect(res.body.data.user.email).toBe('ada.king@example.com');
+  });
+
+  it('rejects a profile update with an invalid payload', async () => {
+    const res = await request(app)
+      .put('/api/user/profile')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'A', email: 'not-an-email' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a profile update to an email already used by another account', async () => {
+    await request(app).post('/api/auth/register').send({
+      name: 'Katherine Johnson',
+      email: 'katherine@example.com',
+      password: 'password123',
+    });
+
+    const res = await request(app)
+      .put('/api/user/profile')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ name: 'Ada King', email: 'katherine@example.com' });
+    expect(res.status).toBe(409);
+  });
+
+  it('rejects a password change with the wrong current password', async () => {
+    const res = await request(app)
+      .put('/api/user/password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ currentPassword: 'wrongpassword', newPassword: 'newpassword123' });
+    expect(res.status).toBe(400);
+  });
+
+  it('changes the password with the correct current password', async () => {
+    const res = await request(app)
+      .put('/api/user/password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ currentPassword: 'password123', newPassword: 'newpassword123' });
+    expect(res.status).toBe(200);
+  });
+
+  it('logs in with the new password', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'ada.king@example.com', password: 'newpassword123' });
+    expect(res.status).toBe(200);
+    accessToken = res.body.data.accessToken;
+  });
+
+  it('no longer logs in with the old password', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'ada.king@example.com', password: 'password123' });
+    expect(res.status).toBe(401);
+  });
+
   it('creates a shortened link', async () => {
     const res = await request(app)
       .post('/api/links')

@@ -31,3 +31,18 @@ export async function getProfileRequest(): Promise<User> {
   const { data } = await api.get<{ data: { user: User } }>('/user/profile');
   return data.data.user;
 }
+
+export async function updateProfileRequest(payload: {
+  name: string;
+  email: string;
+}): Promise<User> {
+  const { data } = await api.put<{ data: { user: User } }>('/user/profile', payload);
+  return data.data.user;
+}
+
+export async function changePasswordRequest(payload: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<void> {
+  await api.put('/user/password', payload);
+}

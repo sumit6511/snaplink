@@ -1,9 +1,46 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/context/AuthContext';
+import { useUpdateProfile } from '@/hooks/useUser';
 import { formatDate } from '@/utils/format';
+import { getErrorMessage } from '@/utils/errorMessage';
+import { updateProfileSchema, type UpdateProfileFormValues } from '@/validators/user';
 
 export function DashboardProfilePage() {
   const { user } = useAuth();
+  const updateProfileMutation = useUpdateProfile();
+  const [formError, setFormError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<UpdateProfileFormValues>({
+    resolver: zodResolver(updateProfileSchema),
+    // Controlled by AuthContext's user, which updateUser() refreshes on a
+    // successful save — that resync also clears isDirty automatically.
+    values: { name: user?.name ?? '', email: user?.email ?? '' },
+  });
+
+  // isDirty flips true the instant the user edits again, so gating on it
+  // here hides the banner on the next keystroke without a separate effect.
+  const showSuccess = success && !isDirty;
+
+  const onSubmit = async (values: UpdateProfileFormValues) => {
+    setFormError(null);
+    setSuccess(false);
+    try {
+      await updateProfileMutation.mutateAsync(values);
+      setSuccess(true);
+    } catch (error) {
+      setFormError(getErrorMessage(error, 'Could not update your profile.'));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -19,32 +56,38 @@ export function DashboardProfilePage() {
           </div>
           <div>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">{user?.name}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Member since {user?.createdAt ? formatDate(user.createdAt) : '—'}
+            </p>
           </div>
         </div>
 
-        <dl className="mt-8 grid grid-cols-1 gap-6 border-t border-gray-100 pt-6 sm:grid-cols-2 dark:border-gray-800">
-          <div>
-            <dt className="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
-              Full name
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user?.name}</dd>
+        <form
+          className="mt-8 space-y-4 border-t border-gray-100 pt-6 dark:border-gray-800"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input label="Full name" error={errors.name?.message} {...register('name')} />
+            <Input
+              label="Email address"
+              type="email"
+              error={errors.email?.message}
+              {...register('email')}
+            />
           </div>
-          <div>
-            <dt className="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
-              Email address
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 dark:text-white">{user?.email}</dd>
+
+          {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
+          {showSuccess && (
+            <p className="text-sm text-green-600 dark:text-green-400">Profile updated.</p>
+          )}
+
+          <div className="flex justify-end pt-2">
+            <Button type="submit" isLoading={isSubmitting} disabled={!isDirty}>
+              Save changes
+            </Button>
           </div>
-          <div>
-            <dt className="text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
-              Member since
-            </dt>
-            <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-              {user?.createdAt ? formatDate(user.createdAt) : '—'}
-            </dd>
-          </div>
-        </dl>
+        </form>
       </Card>
     </div>
   );

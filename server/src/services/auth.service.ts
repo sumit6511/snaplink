@@ -4,6 +4,7 @@ import { User, UserDocument } from '../models/User.model';
 import { AppError } from '../utils/AppError';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { LoginInput, RegisterInput } from '../validators/auth.validator';
+import { ChangePasswordInput, UpdateProfileInput } from '../validators/user.validator';
 
 interface AuthResult {
   user: UserDocument;
@@ -72,4 +73,43 @@ export async function getUserProfile(userId: string): Promise<UserDocument> {
     throw AppError.notFound('User not found');
   }
   return user;
+}
+
+export async function updateUserProfile(
+  userId: string,
+  input: UpdateProfileInput,
+): Promise<UserDocument> {
+  const emailOwner = await User.findOne({ email: input.email }).select('_id').lean();
+  if (emailOwner && emailOwner._id.toString() !== userId) {
+    throw AppError.conflict('An account with this email already exists');
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw AppError.notFound('User not found');
+  }
+
+  user.name = input.name;
+  user.email = input.email;
+  await user.save();
+
+  return user;
+}
+
+export async function changeUserPassword(
+  userId: string,
+  input: ChangePasswordInput,
+): Promise<void> {
+  const user = await User.findById(userId).select('+password');
+  if (!user) {
+    throw AppError.notFound('User not found');
+  }
+
+  const isMatch = await user.comparePassword(input.currentPassword);
+  if (!isMatch) {
+    throw AppError.badRequest('Current password is incorrect');
+  }
+
+  user.password = input.newPassword;
+  await user.save();
 }

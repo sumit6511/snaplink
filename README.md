@@ -61,7 +61,7 @@ that mirrors the same domain boundaries (services, hooks, typed API contracts).
 - Copy the short link to the clipboard; open it in a new tab
 - Auto-generated QR code per link, downloadable as a PNG
 - Stat cards (total links, total clicks, active/expired) and a recent-links widget
-- Settings (theme) and Profile pages
+- Editable profile (name, email) and password change; theme toggle
 
 **Analytics** (per link)
 
