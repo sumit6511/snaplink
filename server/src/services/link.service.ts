@@ -158,6 +158,31 @@ export async function getLinkStats(ownerId: string): Promise<LinkStats> {
   return { totalLinks, totalClicks, expiredLinks, activeLinks: totalLinks - expiredLinks };
 }
 
+export interface BulkImportResult {
+  created: LinkDocument[];
+  failed: { url: string; reason: string }[];
+}
+
+// Sequential rather than Promise.all: generateUniqueShortCode reads then
+// writes shortCode uniqueness one link at a time, and running many of those
+// concurrently would race (two URLs could check-and-not-find the same free
+// code before either has saved it, causing collisions the DB would then
+// reject asymmetrically). Simpler to just process one at a time.
+export async function bulkImportLinks(ownerId: string, urls: string[]): Promise<BulkImportResult> {
+  const created: LinkDocument[] = [];
+  const failed: { url: string; reason: string }[] = [];
+
+  for (const url of urls) {
+    try {
+      created.push(await createLink(ownerId, { originalUrl: url }));
+    } catch (err) {
+      failed.push({ url, reason: err instanceof Error ? err.message : 'Could not create link' });
+    }
+  }
+
+  return { created, failed };
+}
+
 export async function exportLinksCsv(ownerId: string, search?: string): Promise<string> {
   const filter = buildSearchFilter(ownerId, search);
   const links = await Link.find(filter).sort({ createdAt: -1 });

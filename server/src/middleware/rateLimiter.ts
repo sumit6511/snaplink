@@ -28,3 +28,14 @@ export const redirectLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: 'Too many requests, please try again shortly.' },
 });
+
+// A single import can create up to MAX_BULK_IMPORT_URLS links (each with its
+// own QR code generation), so this is far stricter than apiLimiter to keep
+// a handful of accidental double-submits from turning into a real cost.
+export const bulkImportLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many import requests, please try again later.' },
+});

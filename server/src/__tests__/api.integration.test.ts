@@ -271,6 +271,48 @@ describe('SnapLink API', () => {
     expect(analyticsExportRes.status).toBe(404);
   });
 
+  it('imports multiple links in bulk', async () => {
+    const res = await request(app)
+      .post('/api/links/bulk-import')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        urls: [
+          'https://example.com/bulk-one',
+          'https://example.com/bulk-two',
+          'https://example.com/bulk-three',
+        ],
+      });
+    expect(res.status).toBe(201);
+    expect(res.body.data.created).toHaveLength(3);
+    expect(res.body.data.failed).toHaveLength(0);
+    expect(res.body.data.created[0].shortCode).toHaveLength(7);
+  });
+
+  it('rejects a bulk import containing an invalid URL', async () => {
+    const res = await request(app)
+      .post('/api/links/bulk-import')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ urls: ['https://example.com/valid', 'not-a-url'] });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects an empty bulk import', async () => {
+    const res = await request(app)
+      .post('/api/links/bulk-import')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ urls: [] });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a bulk import over the URL limit', async () => {
+    const urls = Array.from({ length: 51 }, (_, i) => `https://example.com/bulk-limit-${i}`);
+    const res = await request(app)
+      .post('/api/links/bulk-import')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ urls });
+    expect(res.status).toBe(400);
+  });
+
   it('deletes the link', async () => {
     const res = await request(app)
       .delete(`/api/links/${linkId}`)

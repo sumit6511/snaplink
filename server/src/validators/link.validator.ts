@@ -51,7 +51,17 @@ export const listLinksQuerySchema = z.object({
 
 export const exportLinksQuerySchema = listLinksQuerySchema.pick({ search: true });
 
+export const MAX_BULK_IMPORT_URLS = 50;
+
+export const bulkImportSchema = z.object({
+  urls: z
+    .array(httpUrlField)
+    .min(1, 'Add at least one URL')
+    .max(MAX_BULK_IMPORT_URLS, `Import at most ${MAX_BULK_IMPORT_URLS} URLs at a time`),
+});
+
 export type CreateLinkInput = z.infer<typeof createLinkSchema>;
 export type UpdateLinkInput = z.infer<typeof updateLinkSchema>;
 export type ListLinksQuery = z.infer<typeof listLinksQuerySchema>;
 export type ExportLinksQuery = z.infer<typeof exportLinksQuerySchema>;
+export type BulkImportInput = z.infer<typeof bulkImportSchema>;

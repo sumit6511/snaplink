@@ -1,11 +1,17 @@
 import { Request, Response } from 'express';
 import * as linkService from '../services/link.service';
 import { catchAsync } from '../utils/catchAsync';
-import { ExportLinksQuery, ListLinksQuery } from '../validators/link.validator';
+import { BulkImportInput, ExportLinksQuery, ListLinksQuery } from '../validators/link.validator';
 
 export const create = catchAsync(async (req: Request, res: Response) => {
   const link = await linkService.createLink(req.userId!, req.body);
   res.status(201).json({ success: true, data: { link } });
+});
+
+export const bulkImport = catchAsync(async (req: Request, res: Response) => {
+  const { urls } = req.body as BulkImportInput;
+  const { created, failed } = await linkService.bulkImportLinks(req.userId!, urls);
+  res.status(201).json({ success: true, data: { created, failed } });
 });
 
 export const list = catchAsync(async (req: Request, res: Response) => {

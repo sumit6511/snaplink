@@ -54,6 +54,16 @@ export async function deleteLinkRequest(id: string): Promise<void> {
   await api.delete(`/links/${id}`);
 }
 
+export interface BulkImportResult {
+  created: Link[];
+  failed: { url: string; reason: string }[];
+}
+
+export async function bulkImportLinksRequest(urls: string[]): Promise<BulkImportResult> {
+  const { data } = await api.post<{ data: BulkImportResult }>('/links/bulk-import', { urls });
+  return data.data;
+}
+
 export async function exportLinksCsvRequest(search?: string): Promise<Blob> {
   const { data } = await api.get<Blob>('/links/export', {
     params: search ? { search } : undefined,

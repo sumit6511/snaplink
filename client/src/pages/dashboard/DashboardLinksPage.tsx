@@ -1,6 +1,16 @@
-import { BarChart3, Download, Pencil, PlusCircle, QrCode, Search, Trash2 } from 'lucide-react';
+import {
+  BarChart3,
+  Download,
+  Pencil,
+  PlusCircle,
+  QrCode,
+  Search,
+  Trash2,
+  Upload,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { BulkImportModal } from '@/components/dashboard/BulkImportModal';
 import { CopyButton } from '@/components/dashboard/CopyButton';
 import { LinkFormModal } from '@/components/dashboard/LinkFormModal';
 import { QrCodeModal } from '@/components/dashboard/QrCodeModal';
@@ -27,6 +37,7 @@ export function DashboardLinksPage() {
   const debouncedSearch = useDebouncedValue(search, 350);
 
   const [formOpen, setFormOpen] = useState(false);
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<Link | null>(null);
   const [qrLink, setQrLink] = useState<Link | null>(null);
   const [deletingLink, setDeletingLink] = useState<Link | null>(null);
@@ -75,6 +86,10 @@ export function DashboardLinksPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
+            <Upload className="size-4" />
+            Bulk import
+          </Button>
           <Button variant="outline" onClick={() => void exportCsv()} isLoading={isExporting}>
             <Download className="size-4" />
             Export CSV
@@ -215,6 +230,7 @@ export function DashboardLinksPage() {
       </Card>
 
       <LinkFormModal open={formOpen} onClose={() => setFormOpen(false)} link={editingLink} />
+      <BulkImportModal open={bulkImportOpen} onClose={() => setBulkImportOpen(false)} />
       <QrCodeModal open={Boolean(qrLink)} onClose={() => setQrLink(null)} link={qrLink} />
       <ConfirmDialog
         open={Boolean(deletingLink)}

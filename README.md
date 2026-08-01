@@ -58,6 +58,7 @@ that mirrors the same domain boundaries (services, hooks, typed API contracts).
 **Dashboard**
 
 - Create shortened links with an optional custom alias, title, and expiration date
+- Bulk import up to 50 URLs at once (paste a list, get short links for all of them)
 - Edit and delete links; searchable, paginated link list
 - Copy the short link to the clipboard; open it in a new tab
 - Auto-generated QR code per link, downloadable as a PNG
@@ -242,6 +243,7 @@ redirect itself, which is intentionally at the root so links stay short.
 | PUT    | `/api/user/profile`         | Bearer token   | Update name/email                                                   |
 | PUT    | `/api/user/password`        | Bearer token   | Change password (requires the current one)                          |
 | POST   | `/api/links`                | Bearer token   | Create a short link                                                 |
+| POST   | `/api/links/bulk-import`    | Bearer token   | Create up to 50 links at once from a list of URLs                   |
 | GET    | `/api/links`                | Bearer token   | List your links (`?page&limit&search`)                              |
 | GET    | `/api/links/stats/summary`  | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
 | GET    | `/api/links/export`         | Bearer token   | Export your links as CSV (`?search`)                                |
@@ -348,7 +350,6 @@ It runs two ways:
 Not implemented yet, in roughly the order they'd add the most value:
 
 - Password reset and email verification
-- Bulk URL import
 - Custom domains per account
 - PWA support (offline shell, installability)
 - Redis-backed rate limiting (the current in-memory store doesn't share state across

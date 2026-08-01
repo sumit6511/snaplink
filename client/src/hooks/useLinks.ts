@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  bulkImportLinksRequest,
   createLinkRequest,
   deleteLinkRequest,
   getLinkStatsRequest,
@@ -40,6 +41,16 @@ export function useUpdateLink() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdateLinkInput }) =>
       updateLinkRequest(id, input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['links'] });
+    },
+  });
+}
+
+export function useBulkImportLinks() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (urls: string[]) => bulkImportLinksRequest(urls),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['links'] });
     },
