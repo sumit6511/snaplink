@@ -41,4 +41,5 @@ jobs:
       - run: npm ci
       - run: npm run typecheck --workspace=client
       - run: npm run lint --workspace=client
+      - run: npm test --workspace=client
       - run: npm run build --workspace=client

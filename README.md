@@ -216,11 +216,13 @@ to the API container) — client at `http://localhost:8080`, API at
 ### Tests
 
 ```bash
-npm test --workspace=server
+npm test --workspace=server   # Vitest + Supertest integration suite
+npm test --workspace=client   # Vitest + Testing Library unit/component suite
 ```
 
-Runs the Vitest + Supertest integration suite against an in-memory MongoDB
-(`mongodb-memory-server`, which downloads a real `mongod` binary on first use).
+The server suite runs against an in-memory MongoDB (`mongodb-memory-server`, which
+downloads a real `mongod` binary on first use). The client suite covers validators,
+formatting/URL utilities, and UI components with `@testing-library/react` + jsdom.
 
 ## API documentation
 
@@ -322,6 +324,5 @@ Not implemented yet, in roughly the order they'd add the most value:
 - Bulk URL import and CSV export of links/analytics
 - Custom domains per account
 - PWA support (offline shell, installability)
-- Client-side test suite (the backend has an integration suite; the frontend doesn't yet)
 - Redis-backed rate limiting (the current in-memory store doesn't share state across
   multiple server instances)
