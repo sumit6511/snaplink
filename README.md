@@ -38,13 +38,13 @@ that mirrors the same domain boundaries (services, hooks, typed API contracts).
 
 ## Screenshots
 
-> Add screenshots or a short screen recording here once you have a MongoDB instance
-> running locally — see [Running locally](#running-locally). Suggested shots:
-> `docs/screenshots/landing.png`, `dashboard.png`, `links.png`, `analytics.png`.
+| Landing page                                  | Dashboard                                    |
+| --------------------------------------------- | -------------------------------------------- |
+| ![Landing page](docs/screenshots/landing.png) | ![Dashboard](docs/screenshots/dashboard.png) |
 
-| Landing page     | Dashboard        | Analytics        |
-| ---------------- | ---------------- | ---------------- |
-| _add screenshot_ | _add screenshot_ | _add screenshot_ |
+| Links                                | Analytics                                    |
+| ------------------------------------ | -------------------------------------------- |
+| ![Links](docs/screenshots/links.png) | ![Analytics](docs/screenshots/analytics.png) |
 
 ## Features
 
