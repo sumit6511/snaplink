@@ -27,7 +27,7 @@ jobs:
         with:
           path: ~/.cache/mongodb-binaries
           key: mongodb-binaries-${{ runner.os }}
-      - run: npm test --workspace=server
+      - run: npm run test:coverage --workspace=server
 
   client:
     name: Client
@@ -41,5 +41,5 @@ jobs:
       - run: npm ci
       - run: npm run typecheck --workspace=client
       - run: npm run lint --workspace=client
-      - run: npm test --workspace=client
+      - run: npm run test:coverage --workspace=client
       - run: npm run build --workspace=client

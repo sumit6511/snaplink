@@ -5,6 +5,20 @@ import { startTestDb, stopTestDb } from '../test/dbMemoryServer';
 
 const app = createApp();
 
+// Click tracking is fire-and-forget (the redirect responds before the click
+// is written), so tests that assert on recorded clicks need to poll rather
+// than assume the write has landed by the time the redirect request resolves.
+async function waitForClicks(token: string, id: string, expected: number) {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const res = await request(app)
+      .get(`/api/analytics/${id}`)
+      .set('Authorization', `Bearer ${token}`);
+    if (res.body.data.summary.totalClicks >= expected) return res;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error(`Timed out waiting for ${expected} click(s) to be recorded`);
+}
+
 beforeAll(async () => {
   await startTestDb();
 });
@@ -253,9 +267,7 @@ describe('SnapLink API', () => {
   });
 
   it('returns analytics with the recorded clicks', async () => {
-    const res = await request(app)
-      .get(`/api/analytics/${linkId}`)
-      .set('Authorization', `Bearer ${accessToken}`);
+    const res = await waitForClicks(accessToken, linkId, 2);
     expect(res.status).toBe(200);
     expect(res.body.data.summary.totalClicks).toBe(2);
     expect(res.body.data.clickHistory).toHaveLength(2);
