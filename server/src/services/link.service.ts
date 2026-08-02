@@ -1,4 +1,4 @@
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { FilterQuery, Types } from 'mongoose';
 import { env } from '../config/env';
 import { ClickEvent } from '../models/ClickEvent.model';
@@ -14,10 +14,18 @@ interface Paginated<T> {
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
+// Alphanumeric only — nanoid's default alphabet includes `-` and `_`, which
+// can land as the first character (e.g. "snap.link/-Ab12cD"), reading like a
+// stray dash, and an underscore-led code renders as italics if ever pasted
+// into Slack/Discord/GitHub markdown as plain text.
+const generateShortCode = customAlphabet(
+  '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz',
+);
+
 async function generateUniqueShortCode(): Promise<string> {
   const MAX_ATTEMPTS = 5;
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const code = nanoid(env.SHORT_CODE_LENGTH);
+    const code = generateShortCode(env.SHORT_CODE_LENGTH);
     const exists = await Link.exists({ shortCode: code });
     if (!exists) return code;
   }

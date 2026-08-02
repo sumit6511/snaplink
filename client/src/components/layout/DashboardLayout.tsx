@@ -14,6 +14,9 @@ export function DashboardLayout() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-gray-200 bg-white md:flex dark:border-gray-800 dark:bg-gray-900">
         <DashboardSidebar />
+        <div className="absolute top-6 right-4">
+          <ThemeToggle />
+        </div>
       </aside>
 
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 px-4 backdrop-blur-lg md:hidden dark:border-gray-800 dark:bg-gray-950/80">

@@ -57,7 +57,7 @@ export function AboutPage() {
 
       <section className="pb-20">
         <Container>
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {STATS.map((stat) => (
               <Card key={stat.label} className="p-8 text-center">
                 <p className="text-4xl font-bold text-gradient">{stat.value}</p>
@@ -76,7 +76,7 @@ export function AboutPage() {
             </h2>
           </div>
 
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((value) => (
               <Card key={value.title} className="p-6">
                 <div className="flex size-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">

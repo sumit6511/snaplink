@@ -85,18 +85,27 @@ export function DashboardLinksPage() {
             Create, search, and manage all of your shortened links.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setBulkImportOpen(true)}
+            aria-label="Bulk import"
+          >
             <Download className="size-4" />
-            Bulk import
+            <span className="hidden sm:inline">Bulk import</span>
           </Button>
-          <Button variant="outline" onClick={() => void exportCsv()} isLoading={isExporting}>
+          <Button
+            variant="outline"
+            onClick={() => void exportCsv()}
+            isLoading={isExporting}
+            aria-label="Export CSV"
+          >
             <Upload className="size-4" />
-            Export CSV
+            <span className="hidden sm:inline">Export CSV</span>
           </Button>
-          <Button onClick={openCreate}>
+          <Button onClick={openCreate} aria-label="New link">
             <PlusCircle className="size-4" />
-            New link
+            <span className="hidden sm:inline">New link</span>
           </Button>
         </div>
       </div>
@@ -137,21 +146,74 @@ export function DashboardLinksPage() {
             )}
           </div>
         ) : (
-          <div className="mt-4 -mx-6 overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
-                  <th className="px-6 py-3 font-medium">Link</th>
-                  <th className="px-6 py-3 font-medium">Clicks</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Created</th>
-                  <th className="px-6 py-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {data.links.map((link) => (
-                  <tr key={link.id}>
-                    <td className="max-w-xs px-6 py-4">
+          <>
+            {/* Table: sm and up, where there's room for every column. */}
+            <div className="mt-4 -mx-6 hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-[640px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
+                    <th className="px-6 py-3 font-medium">Link</th>
+                    <th className="px-6 py-3 font-medium">Clicks</th>
+                    <th className="px-6 py-3 font-medium">Status</th>
+                    <th className="px-6 py-3 font-medium">Created</th>
+                    <th className="px-6 py-3 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {data.links.map((link) => (
+                    <tr key={link.id}>
+                      <td className="max-w-xs px-6 py-4">
+                        <p className="truncate font-medium text-gray-900 dark:text-white">
+                          {link.title || link.originalUrl}
+                        </p>
+                        <div className="mt-0.5 flex items-center gap-1.5">
+                          <a
+                            href={getShortUrl(link)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="truncate font-mono text-xs text-primary-600 hover:underline dark:text-primary-400"
+                          >
+                            {getShortUrlDisplay(link)}
+                          </a>
+                          <CopyButton value={getShortUrl(link)} className="size-6 shrink-0" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        {formatNumber(link.clicks)}
+                      </td>
+                      <td className="px-6 py-4">
+                        {link.isExpired ? (
+                          <Badge variant="red">Expired</Badge>
+                        ) : (
+                          <Badge variant="green">Active</Badge>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                        {formatDate(link.createdAt)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <LinkRowActions
+                          link={link}
+                          onShowQr={() => setQrLink(link)}
+                          onEdit={() => openEdit(link)}
+                          onDelete={() => setDeletingLink(link)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Cards: below sm, where a table's columns don't fit — the desktop
+                table hides its Created column and packs actions off-screen with
+                no scroll affordance, so narrow viewports get a stacked layout
+                instead of a table that requires a hidden horizontal swipe. */}
+            <div className="mt-4 divide-y divide-gray-100 sm:hidden dark:divide-gray-800">
+              {data.links.map((link) => (
+                <div key={link.id} className="py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
                       <p className="truncate font-medium text-gray-900 dark:text-white">
                         {link.title || link.originalUrl}
                       </p>
@@ -166,60 +228,33 @@ export function DashboardLinksPage() {
                         </a>
                         <CopyButton value={getShortUrl(link)} className="size-6 shrink-0" />
                       </div>
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {formatNumber(link.clicks)}
-                    </td>
-                    <td className="px-6 py-4">
-                      {link.isExpired ? (
-                        <Badge variant="red">Expired</Badge>
-                      ) : (
-                        <Badge variant="green">Active</Badge>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
-                      {formatDate(link.createdAt)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1">
-                        <RouterLink
-                          to={`/dashboard/analytics/${link.id}`}
-                          aria-label="View analytics"
-                          className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                        >
-                          <BarChart3 className="size-4" />
-                        </RouterLink>
-                        <button
-                          type="button"
-                          onClick={() => setQrLink(link)}
-                          aria-label="Show QR code"
-                          className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                        >
-                          <QrCode className="size-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openEdit(link)}
-                          aria-label="Edit link"
-                          className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
-                        >
-                          <Pencil className="size-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDeletingLink(link)}
-                          aria-label="Delete link"
-                          className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
-                        >
-                          <Trash2 className="size-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                    {link.isExpired ? (
+                      <Badge variant="red" className="shrink-0">
+                        Expired
+                      </Badge>
+                    ) : (
+                      <Badge variant="green" className="shrink-0">
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {formatNumber(link.clicks)} clicks &middot; {formatDate(link.createdAt)}
+                    </p>
+                    <LinkRowActions
+                      link={link}
+                      onShowQr={() => setQrLink(link)}
+                      onEdit={() => openEdit(link)}
+                      onDelete={() => setDeletingLink(link)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {data && (
@@ -240,6 +275,54 @@ export function DashboardLinksPage() {
         onConfirm={() => void confirmDelete()}
         onCancel={() => setDeletingLink(null)}
       />
+    </div>
+  );
+}
+
+function LinkRowActions({
+  link,
+  onShowQr,
+  onEdit,
+  onDelete,
+}: {
+  link: Link;
+  onShowQr: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <RouterLink
+        to={`/dashboard/analytics/${link.id}`}
+        aria-label="View analytics"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      >
+        <BarChart3 className="size-4" />
+      </RouterLink>
+      <button
+        type="button"
+        onClick={onShowQr}
+        aria-label="Show QR code"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      >
+        <QrCode className="size-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onEdit}
+        aria-label="Edit link"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      >
+        <Pencil className="size-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        aria-label="Delete link"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+      >
+        <Trash2 className="size-4" />
+      </button>
     </div>
   );
 }

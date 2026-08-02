@@ -36,7 +36,7 @@ export function DashboardHomePage() {
           <Spinner />
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard icon={Link2} label="Total links" value={formatNumber(stats?.totalLinks ?? 0)} />
           <StatCard
             icon={MousePointerClick}

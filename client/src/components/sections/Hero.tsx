@@ -16,7 +16,7 @@ export function Hero() {
         <div className="aspect-[1.2/1] w-[60rem] bg-gradient-to-tr from-primary-300 via-accent-200 to-primary-100 opacity-40 dark:opacity-20" />
       </div>
 
-      <Container className="grid items-center gap-16 lg:grid-cols-2">
+      <Container className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}

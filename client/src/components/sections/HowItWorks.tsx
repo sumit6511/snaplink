@@ -34,7 +34,7 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-10 sm:grid-cols-3">
+        <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <motion.div
               key={step.title}

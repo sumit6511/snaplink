@@ -134,7 +134,7 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           icon={MousePointerClick}
           label="Total clicks"
@@ -160,7 +160,7 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card className="p-6">
           <h2 className="font-semibold text-gray-900 dark:text-white">Daily clicks</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">Last 30 days</p>
