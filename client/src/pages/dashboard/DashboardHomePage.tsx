@@ -1,5 +1,6 @@
 import { Link2, MousePointerClick, PlusCircle, ShieldCheck, ShieldOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { GettingStartedChecklist } from '@/components/dashboard/GettingStartedChecklist';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { buttonClasses } from '@/utils/buttonVariants';
 import { Card } from '@/components/ui/Card';
@@ -57,6 +58,10 @@ export function DashboardHomePage() {
             accent="gray"
           />
         </div>
+      )}
+
+      {!statsLoading && !recentLoading && (
+        <GettingStartedChecklist stats={stats} recentLinks={recent?.links} />
       )}
 
       <Card className="p-6">
