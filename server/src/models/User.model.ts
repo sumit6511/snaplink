@@ -6,6 +6,11 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
+  emailVerified: boolean;
+  emailVerificationTokenHash?: string;
+  emailVerificationExpires?: Date;
+  passwordResetTokenHash?: string;
+  passwordResetExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +46,29 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
       minlength: 8,
       select: false,
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    // Only the SHA-256 hash of the token is stored — same rationale as
+    // password hashing: a DB leak shouldn't hand out usable reset/verify
+    // links. The raw token only ever exists in the emailed URL.
+    emailVerificationTokenHash: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
+      select: false,
+    },
+    passwordResetTokenHash: {
+      type: String,
+      select: false,
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
   },
   { timestamps: true },
 );
@@ -58,7 +86,16 @@ userSchema.methods.comparePassword = function comparePassword(candidate: string)
 userSchema.set('toJSON', {
   transform: (_doc, ret) => {
     const obj = ret as unknown as { _id: Types.ObjectId } & Record<string, unknown>;
-    const { _id, password: _password, __v, ...rest } = obj;
+    const {
+      _id,
+      password: _password,
+      emailVerificationTokenHash: _evth,
+      emailVerificationExpires: _eve,
+      passwordResetTokenHash: _prth,
+      passwordResetExpires: _pre,
+      __v,
+      ...rest
+    } = obj;
     return { id: _id.toString(), ...rest };
   },
 });

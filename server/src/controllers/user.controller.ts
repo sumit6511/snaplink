@@ -16,3 +16,8 @@ export const changePassword = catchAsync(async (req: Request, res: Response) => 
   await authService.changeUserPassword(req.userId!, req.body);
   res.status(200).json({ success: true, message: 'Password changed successfully' });
 });
+
+export const resendVerification = catchAsync(async (req: Request, res: Response) => {
+  await authService.resendVerificationEmail(req.userId!);
+  res.status(200).json({ success: true, message: 'Verification email sent' });
+});

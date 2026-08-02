@@ -61,6 +61,15 @@ export function LoginPage() {
           {...register('password')}
         />
 
+        <p className="-mt-2 text-right text-sm">
+          <Link
+            to="/forgot-password"
+            className="font-medium text-primary-600 dark:text-primary-400"
+          >
+            Forgot password?
+          </Link>
+        </p>
+
         {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
         <Button type="submit" className="w-full" size="lg" isLoading={isSubmitting}>

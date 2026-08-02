@@ -6,11 +6,14 @@ import { PublicLayout } from '@/components/layout/PublicLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { FullPageSpinner } from '@/components/ui/Spinner';
 import { AboutPage } from '@/pages/AboutPage';
+import { ForgotPasswordPage } from '@/pages/ForgotPasswordPage';
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { PricingPage } from '@/pages/PricingPage';
 import { RegisterPage } from '@/pages/RegisterPage';
+import { ResetPasswordPage } from '@/pages/ResetPasswordPage';
+import { VerifyEmailPage } from '@/pages/VerifyEmailPage';
 
 // Code-split: Chart.js and the rest of the authenticated dashboard have no
 // business being in the bundle a first-time visitor downloads to read the
@@ -49,7 +52,14 @@ function App() {
       <Route element={<GuestRoute />}>
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
+        <Route path="forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="reset-password" element={<ResetPasswordPage />} />
       </Route>
+
+      {/* Not under GuestRoute: registration auto-logs-in, so a user who
+          clicks their verification link is often still authenticated and
+          would otherwise get redirected away before seeing the result. */}
+      <Route path="verify-email" element={<VerifyEmailPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>

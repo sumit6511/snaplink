@@ -17,3 +17,6 @@ export const PAGINATION_DEFAULTS = {
 // isExpired), so this only controls how long their data sticks around for the
 // owner to still see analytics on a recently-expired link before it's purged.
 export const LINK_EXPIRY_GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
+
+export const PASSWORD_RESET_EXPIRY_MS = 60 * 60 * 1000;
+export const EMAIL_VERIFICATION_EXPIRY_MS = 24 * 60 * 60 * 1000;

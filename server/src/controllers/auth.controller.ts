@@ -49,3 +49,21 @@ export const logout = catchAsync(async (_req: Request, res: Response) => {
   res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, refreshCookieOptions);
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
+
+export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  await authService.requestPasswordReset(req.body.email);
+  res.status(200).json({
+    success: true,
+    message: 'If an account exists for that email, a reset link has been sent.',
+  });
+});
+
+export const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  await authService.resetPassword(req.body.token, req.body.newPassword);
+  res.status(200).json({ success: true, message: 'Password reset successfully' });
+});
+
+export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
+  await authService.verifyEmail(req.body.token);
+  res.status(200).json({ success: true, message: 'Email verified successfully' });
+});

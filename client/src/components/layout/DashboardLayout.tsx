@@ -3,6 +3,7 @@ import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { EmailVerificationBanner } from '@/components/dashboard/EmailVerificationBanner';
 import { DashboardSidebar } from '@/components/layout/DashboardSidebar';
 import { Logo } from '@/components/ui/Logo';
 
@@ -63,6 +64,7 @@ export function DashboardLayout() {
 
       <main className="md:pl-64">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+          <EmailVerificationBanner />
           <Outlet />
         </div>
       </main>

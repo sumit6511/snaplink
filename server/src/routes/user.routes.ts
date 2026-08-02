@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as userController from '../controllers/user.controller';
 import { protect } from '../middleware/auth';
-import { authLimiter } from '../middleware/rateLimiter';
+import { authLimiter, emailLimiter } from '../middleware/rateLimiter';
 import { validate } from '../middleware/validate';
 import { changePasswordSchema, updateProfileSchema } from '../validators/user.validator';
 
@@ -16,3 +16,4 @@ userRouter.put(
   validate(changePasswordSchema),
   userController.changePassword,
 );
+userRouter.post('/resend-verification', protect, emailLimiter, userController.resendVerification);

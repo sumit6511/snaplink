@@ -46,3 +46,22 @@ export async function changePasswordRequest(payload: {
 }): Promise<void> {
   await api.put('/user/password', payload);
 }
+
+export async function forgotPasswordRequest(email: string): Promise<void> {
+  await api.post('/auth/forgot-password', { email });
+}
+
+export async function resetPasswordRequest(payload: {
+  token: string;
+  newPassword: string;
+}): Promise<void> {
+  await api.post('/auth/reset-password', payload);
+}
+
+export async function verifyEmailRequest(token: string): Promise<void> {
+  await api.post('/auth/verify-email', { token });
+}
+
+export async function resendVerificationRequest(): Promise<void> {
+  await api.post('/user/resend-verification');
+}

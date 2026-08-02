@@ -67,10 +67,50 @@ describe('SnapLink API', () => {
       .set('Authorization', `Bearer ${accessToken}`);
     expect(res.status).toBe(200);
     expect(res.body.data.user.name).toBe('Ada Lovelace');
+    expect(res.body.data.user.emailVerified).toBe(false);
   });
 
   it('rejects profile access without a token', async () => {
     const res = await request(app).get('/api/user/profile');
+    expect(res.status).toBe(401);
+  });
+
+  it('accepts a forgot-password request without revealing whether the account exists', async () => {
+    const forRealAccount = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: 'ada@example.com' });
+    const forUnknownAccount = await request(app)
+      .post('/api/auth/forgot-password')
+      .send({ email: 'no-such-account@example.com' });
+
+    expect(forRealAccount.status).toBe(200);
+    expect(forUnknownAccount.status).toBe(200);
+    expect(forRealAccount.body.message).toBe(forUnknownAccount.body.message);
+  });
+
+  it('rejects a password reset with an invalid token', async () => {
+    const res = await request(app)
+      .post('/api/auth/reset-password')
+      .send({ token: 'not-a-real-token', newPassword: 'newpassword123' });
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects an email verification with an invalid token', async () => {
+    const res = await request(app)
+      .post('/api/auth/verify-email')
+      .send({ token: 'not-a-real-token' });
+    expect(res.status).toBe(400);
+  });
+
+  it('resends a verification email for the authenticated user', async () => {
+    const res = await request(app)
+      .post('/api/user/resend-verification')
+      .set('Authorization', `Bearer ${accessToken}`);
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects resending a verification email without auth', async () => {
+    const res = await request(app).post('/api/user/resend-verification');
     expect(res.status).toBe(401);
   });
 

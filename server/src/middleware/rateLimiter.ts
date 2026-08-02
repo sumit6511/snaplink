@@ -39,3 +39,15 @@ export const bulkImportLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, message: 'Too many import requests, please try again later.' },
 });
+
+// Every request here can trigger a real outbound email (and, for
+// forgot-password, always returns 200 regardless of outcome to avoid
+// leaking which emails are registered — skipSuccessfulRequests wouldn't
+// distinguish abuse the way it does for authLimiter), so this stays tight.
+export const emailLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again later.' },
+});

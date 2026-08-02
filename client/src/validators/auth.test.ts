@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loginSchema, registerSchema } from './auth';
+import { forgotPasswordSchema, loginSchema, registerSchema, resetPasswordSchema } from './auth';
 
 describe('loginSchema', () => {
   it('accepts a valid email and password', () => {
@@ -73,6 +73,51 @@ describe('registerSchema', () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.issues[0].path).toEqual(['confirmPassword']);
+    }
+  });
+});
+
+describe('forgotPasswordSchema', () => {
+  it('accepts a valid email', () => {
+    expect(forgotPasswordSchema.safeParse({ email: 'ada@example.com' }).success).toBe(true);
+  });
+
+  it('lowercases and trims the email', () => {
+    const result = forgotPasswordSchema.safeParse({ email: '  Ada@Example.com  ' });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.email).toBe('ada@example.com');
+  });
+
+  it('rejects an invalid email', () => {
+    expect(forgotPasswordSchema.safeParse({ email: 'not-an-email' }).success).toBe(false);
+  });
+});
+
+describe('resetPasswordSchema', () => {
+  const valid = { newPassword: 'newpassword1', confirmNewPassword: 'newpassword1' };
+
+  it('accepts valid, matching input', () => {
+    expect(resetPasswordSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('rejects a password with no digit', () => {
+    const result = resetPasswordSchema.safeParse({
+      newPassword: 'onlyletters',
+      confirmNewPassword: 'onlyletters',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects a password shorter than 8 characters', () => {
+    const result = resetPasswordSchema.safeParse({ newPassword: 'ab1', confirmNewPassword: 'ab1' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects mismatched passwords, flagging confirmNewPassword specifically', () => {
+    const result = resetPasswordSchema.safeParse({ ...valid, confirmNewPassword: 'different1' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues[0].path).toEqual(['confirmNewPassword']);
     }
   });
 });

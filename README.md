@@ -26,6 +26,7 @@ click history) for every link you create.
 - [Security](#security)
 - [Deployment](#deployment)
 - [Background jobs](#background-jobs)
+- [Transactional email](#transactional-email)
 - [Future improvements](#future-improvements)
 
 ## Overview
@@ -54,6 +55,7 @@ that mirrors the same domain boundaries (services, hooks, typed API contracts).
 - Landing page (hero, features, how it works, testimonials, pricing, FAQ)
 - About and Pricing pages
 - Register / log in (JWT access token + httpOnly refresh cookie, silent re-auth on reload)
+- Forgot/reset password and email verification, both via emailed one-time links
 
 **Dashboard**
 
@@ -169,20 +171,22 @@ cp client/.env.example client/.env
 
 **`server/.env`**
 
-| Variable                 | Description                                                    | Default                 |
-| ------------------------ | -------------------------------------------------------------- | ----------------------- |
-| `NODE_ENV`               | `development` \| `test` \| `production`                        | `development`           |
-| `PORT`                   | Port the API listens on                                        | `5000`                  |
-| `CLIENT_URL`             | Frontend origin, used for CORS                                 | `http://localhost:5173` |
-| `BASE_URL`               | Public URL this API's redirects resolve from                   | `http://localhost:5000` |
-| `MONGODB_URI`            | MongoDB connection string                                      | — (required)            |
-| `JWT_SECRET`             | Access token signing secret (16+ chars)                        | — (required)            |
-| `JWT_EXPIRES_IN`         | Access token lifetime                                          | `15m`                   |
-| `JWT_REFRESH_SECRET`     | Refresh token signing secret (16+ chars, different from above) | — (required)            |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh token lifetime                                         | `7d`                    |
-| `RATE_LIMIT_WINDOW_MS`   | General API rate-limit window                                  | `900000` (15 min)       |
-| `RATE_LIMIT_MAX`         | Max requests per window per IP                                 | `300`                   |
-| `SHORT_CODE_LENGTH`      | Length of auto-generated short codes                           | `7`                     |
+| Variable                 | Description                                                                                                                             | Default                            |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `NODE_ENV`               | `development` \| `test` \| `production`                                                                                                 | `development`                      |
+| `PORT`                   | Port the API listens on                                                                                                                 | `5000`                             |
+| `CLIENT_URL`             | Frontend origin, used for CORS                                                                                                          | `http://localhost:5173`            |
+| `BASE_URL`               | Public URL this API's redirects resolve from                                                                                            | `http://localhost:5000`            |
+| `MONGODB_URI`            | MongoDB connection string                                                                                                               | — (required)                       |
+| `JWT_SECRET`             | Access token signing secret (16+ chars)                                                                                                 | — (required)                       |
+| `JWT_EXPIRES_IN`         | Access token lifetime                                                                                                                   | `15m`                              |
+| `JWT_REFRESH_SECRET`     | Refresh token signing secret (16+ chars, different from above)                                                                          | — (required)                       |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token lifetime                                                                                                                  | `7d`                               |
+| `RATE_LIMIT_WINDOW_MS`   | General API rate-limit window                                                                                                           | `900000` (15 min)                  |
+| `RATE_LIMIT_MAX`         | Max requests per window per IP                                                                                                          | `300`                              |
+| `SHORT_CODE_LENGTH`      | Length of auto-generated short codes                                                                                                    | `7`                                |
+| `RESEND_API_KEY`         | [Resend](https://resend.com) API key for password-reset/verification emails — optional, see [Transactional email](#transactional-email) | — (optional)                       |
+| `EMAIL_FROM`             | From address for those emails                                                                                                           | `SnapLink <onboarding@resend.dev>` |
 
 **`client/.env`**
 
@@ -233,26 +237,30 @@ formatting/URL utilities, and UI components with `@testing-library/react` + jsdo
 All endpoints are JSON over HTTPS and prefixed with `/api`, except the short-link
 redirect itself, which is intentionally at the root so links stay short.
 
-| Method | Endpoint                    | Auth           | Description                                                         |
-| ------ | --------------------------- | -------------- | ------------------------------------------------------------------- |
-| POST   | `/api/auth/register`        | —              | Create an account, returns an access token + sets a refresh cookie  |
-| POST   | `/api/auth/login`           | —              | Log in                                                              |
-| POST   | `/api/auth/refresh`         | Refresh cookie | Mint a new access token                                             |
-| POST   | `/api/auth/logout`          | —              | Clear the refresh cookie                                            |
-| GET    | `/api/user/profile`         | Bearer token   | Current user's profile                                              |
-| PUT    | `/api/user/profile`         | Bearer token   | Update name/email                                                   |
-| PUT    | `/api/user/password`        | Bearer token   | Change password (requires the current one)                          |
-| POST   | `/api/links`                | Bearer token   | Create a short link                                                 |
-| POST   | `/api/links/bulk-import`    | Bearer token   | Create up to 50 links at once from a list of URLs                   |
-| GET    | `/api/links`                | Bearer token   | List your links (`?page&limit&search`)                              |
-| GET    | `/api/links/stats/summary`  | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
-| GET    | `/api/links/export`         | Bearer token   | Export your links as CSV (`?search`)                                |
-| GET    | `/api/links/:id`            | Bearer token   | Get one link (must be owned by the caller)                          |
-| PUT    | `/api/links/:id`            | Bearer token   | Update a link                                                       |
-| DELETE | `/api/links/:id`            | Bearer token   | Delete a link and its click history                                 |
-| GET    | `/api/analytics/:id`        | Bearer token   | Full analytics for one link (breakdowns, timeseries, click history) |
-| GET    | `/api/analytics/:id/export` | Bearer token   | Export the link's full click history as CSV                         |
-| GET    | `/:shortCode`               | —              | Resolve a short code/alias and redirect (records a click)           |
+| Method | Endpoint                        | Auth           | Description                                                         |
+| ------ | ------------------------------- | -------------- | ------------------------------------------------------------------- |
+| POST   | `/api/auth/register`            | —              | Create an account, returns an access token + sets a refresh cookie  |
+| POST   | `/api/auth/login`               | —              | Log in                                                              |
+| POST   | `/api/auth/refresh`             | Refresh cookie | Mint a new access token                                             |
+| POST   | `/api/auth/logout`              | —              | Clear the refresh cookie                                            |
+| POST   | `/api/auth/forgot-password`     | —              | Request a password reset email (always 200, no email enumeration)   |
+| POST   | `/api/auth/reset-password`      | —              | Reset password using an emailed token                               |
+| POST   | `/api/auth/verify-email`        | —              | Verify email using an emailed token                                 |
+| GET    | `/api/user/profile`             | Bearer token   | Current user's profile                                              |
+| PUT    | `/api/user/profile`             | Bearer token   | Update name/email (unverifies email if it changed)                  |
+| PUT    | `/api/user/password`            | Bearer token   | Change password (requires the current one)                          |
+| POST   | `/api/user/resend-verification` | Bearer token   | Resend the email verification link                                  |
+| POST   | `/api/links`                    | Bearer token   | Create a short link                                                 |
+| POST   | `/api/links/bulk-import`        | Bearer token   | Create up to 50 links at once from a list of URLs                   |
+| GET    | `/api/links`                    | Bearer token   | List your links (`?page&limit&search`)                              |
+| GET    | `/api/links/stats/summary`      | Bearer token   | Aggregate stats (total links/clicks, active/expired)                |
+| GET    | `/api/links/export`             | Bearer token   | Export your links as CSV (`?search`)                                |
+| GET    | `/api/links/:id`                | Bearer token   | Get one link (must be owned by the caller)                          |
+| PUT    | `/api/links/:id`                | Bearer token   | Update a link                                                       |
+| DELETE | `/api/links/:id`                | Bearer token   | Delete a link and its click history                                 |
+| GET    | `/api/analytics/:id`            | Bearer token   | Full analytics for one link (breakdowns, timeseries, click history) |
+| GET    | `/api/analytics/:id/export`     | Bearer token   | Export the link's full click history as CSV                         |
+| GET    | `/:shortCode`                   | —              | Resolve a short code/alias and redirect (records a click)           |
 
 Every mutating endpoint validates its input with Zod and returns `400` with field-level
 errors on failure. Endpoints scoped to a link return `404` (not `403`) when the link
@@ -272,6 +280,11 @@ exists but belongs to another user, so ownership isn't leaked through the respon
   are applied globally.
 - Link URLs are restricted to `http(s)` — Zod's plain URL check would otherwise also
   accept `javascript:`/`data:` schemes.
+- Password reset / email verification tokens are single-use, expiring, and stored as a
+  SHA-256 hash (never the raw token) — same rationale as password hashing. Forgot-password
+  always responds identically regardless of whether the email is registered.
+- CSV exports guard against formula injection: a cell starting with `=`, `+`, `-`, or `@`
+  gets a neutralizing leading quote before Excel/Sheets can interpret it as a formula.
 - CORS is locked to `CLIENT_URL`, not a wildcard.
 - `app.set('trust proxy', 1)` assumes exactly one reverse proxy hop in front of the API
   (Nginx, a load balancer, etc.). **Only enable this when actually deployed behind one** —
@@ -345,11 +358,29 @@ It runs two ways:
   between requests — Render's free tier does this, so its in-process `node-cron`
   schedule isn't guaranteed to fire.
 
+## Transactional email
+
+Password reset and email verification links are sent via [Resend](https://resend.com).
+`RESEND_API_KEY` is optional — without it, `email.service.ts` logs the recipient,
+subject, and the actual reset/verify link instead of sending anything, so the rest of
+the app (including CI) works with zero email setup. To send real emails:
+
+1. Sign up at [resend.com](https://resend.com) (free, no card required) and create an
+   API key.
+2. Set `RESEND_API_KEY` in `server/.env`. The default `EMAIL_FROM`
+   (`onboarding@resend.dev`) works immediately with no domain verification needed —
+   swap it for a verified domain of your own before sending to real users at scale.
+
+Both the reset and verification tokens are single-use, expire (1 hour and 24 hours
+respectively), and only their SHA-256 hash is stored — the same rationale as password
+hashing, so a database leak can't be replayed as a working link. `forgot-password`
+always responds identically whether or not the email is registered, to avoid leaking
+which addresses have accounts.
+
 ## Future improvements
 
 Not implemented yet, in roughly the order they'd add the most value:
 
-- Password reset and email verification
 - Custom domains per account
 - PWA support (offline shell, installability)
 - Redis-backed rate limiting (the current in-memory store doesn't share state across

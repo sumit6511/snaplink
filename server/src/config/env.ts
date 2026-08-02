@@ -20,6 +20,12 @@ const envSchema = z.object({
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
 
   SHORT_CODE_LENGTH: z.coerce.number().int().min(4).max(20).default(7),
+
+  // Optional: without it, password-reset/verification emails are logged
+  // instead of sent (see email.service.ts) so the rest of the app — and
+  // CI, which has no real key — still works.
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default('SnapLink <onboarding@resend.dev>'),
 });
 
 const parsed = envSchema.safeParse(process.env);
