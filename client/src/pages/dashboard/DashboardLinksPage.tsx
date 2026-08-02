@@ -87,11 +87,11 @@ export function DashboardLinksPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
-            <Upload className="size-4" />
+            <Download className="size-4" />
             Bulk import
           </Button>
           <Button variant="outline" onClick={() => void exportCsv()} isLoading={isExporting}>
-            <Download className="size-4" />
+            <Upload className="size-4" />
             Export CSV
           </Button>
           <Button onClick={openCreate}>

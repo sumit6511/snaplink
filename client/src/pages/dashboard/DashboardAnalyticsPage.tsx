@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar, Clock, Download, MousePointerClick, Search } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MousePointerClick, Search, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -232,7 +232,7 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
               onClick={() => void exportCsv()}
               isLoading={isExporting}
             >
-              <Download className="size-4" />
+              <Upload className="size-4" />
               Export CSV
             </Button>
           )}
