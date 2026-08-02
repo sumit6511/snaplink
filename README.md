@@ -200,9 +200,7 @@ cp client/.env.example client/.env
 npm run dev
 ```
 
-This runs both workspaces concurrently: the API on `http://localhost:5000` and the
-frontend on `http://localhost:5173` (Vite proxies `/api` to the backend, so no CORS
-setup is needed in dev). Or run them individually:
+This runs both workspaces concurrently. By default the API uses `http://localhost:5000` and the frontend uses `http://localhost:5173`, but if either port is already busy the launcher picks the next free localhost port and keeps the matching env vars in sync so CORS, the proxy, and copied short links all stay correct. Or run them individually:
 
 ```bash
 npm run dev:server
