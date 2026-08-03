@@ -80,15 +80,15 @@ export function GettingStartedChecklist({ stats, recentLinks }: GettingStartedCh
           type="button"
           onClick={dismiss}
           aria-label="Dismiss getting started checklist"
-          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-900/5 hover:text-gray-600 dark:hover:bg-white/10 dark:hover:text-gray-300"
         >
           <X className="size-4" />
         </button>
       </div>
 
-      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-gray-900/5 dark:bg-white/5">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-primary-600 to-accent-600 transition-[width] duration-300"
+          className="glow-primary h-full rounded-full bg-gradient-to-r from-primary-500 to-accent-500 transition-[width] duration-500 ease-out"
           style={{ width: `${(doneCount / items.length) * 100}%` }}
         />
       </div>

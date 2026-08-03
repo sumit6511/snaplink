@@ -1,4 +1,5 @@
 import { ArrowLeft, Calendar, Clock, MousePointerClick, Search, Upload } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -9,7 +10,7 @@ import { TimeSeriesChart } from '@/components/charts/TimeSeriesChart';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
-import { Spinner } from '@/components/ui/Spinner';
+import { ListRowSkeleton, StatCardSkeleton } from '@/components/ui/Skeleton';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useLinkAnalytics } from '@/hooks/useLinkAnalytics';
 import { useLinks } from '@/hooks/useLinks';
@@ -28,7 +29,12 @@ function AnalyticsLinkPicker() {
   });
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -48,20 +54,22 @@ function AnalyticsLinkPicker() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-16">
-            <Spinner />
+          <div className="mt-4 divide-y divide-gray-900/5 dark:divide-white/5">
+            <ListRowSkeleton />
+            <ListRowSkeleton />
+            <ListRowSkeleton />
           </div>
         ) : !data || data.links.length === 0 ? (
           <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
             No links to show yet.
           </p>
         ) : (
-          <div className="mt-4 divide-y divide-gray-100 dark:divide-gray-800">
+          <div className="mt-4 divide-y divide-gray-900/5 dark:divide-white/5">
             {data.links.map((link) => (
               <RouterLink
                 key={link.id}
                 to={`/dashboard/analytics/${link.id}`}
-                className="flex items-center justify-between gap-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/40"
+                className="flex items-center justify-between gap-4 rounded-lg py-3 transition-colors hover:bg-gray-900/[0.02] dark:hover:bg-white/[0.03]"
               >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
@@ -79,7 +87,7 @@ function AnalyticsLinkPicker() {
           </div>
         )}
       </Card>
-    </div>
+    </motion.div>
   );
 }
 
@@ -99,8 +107,17 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-24">
-        <Spinner />
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+          <StatCardSkeleton />
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="glass h-64 animate-pulse rounded-2xl" />
+          <div className="glass h-64 animate-pulse rounded-2xl" />
+        </div>
       </div>
     );
   }
@@ -116,7 +133,12 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
   const { link, summary, breakdown, timeseries, clickHistory } = data;
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+    >
       <RouterLink
         to="/dashboard/analytics"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
@@ -245,7 +267,7 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
           <div className="mt-4 max-h-96 -mx-6 overflow-y-auto">
             <table className="w-full min-w-[560px] text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
+                <tr className="border-b border-gray-900/5 text-xs tracking-wide text-gray-500 uppercase dark:border-white/5 dark:text-gray-400">
                   <th className="px-6 py-2 font-medium">Time</th>
                   <th className="px-6 py-2 font-medium">Browser</th>
                   <th className="px-6 py-2 font-medium">OS</th>
@@ -254,9 +276,12 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
                   <th className="px-6 py-2 font-medium">Referrer</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              <tbody className="divide-y divide-gray-900/5 dark:divide-white/5">
                 {clickHistory.map((entry, i) => (
-                  <tr key={`${entry.timestamp}-${i}`}>
+                  <tr
+                    key={`${entry.timestamp}-${i}`}
+                    className="transition-colors hover:bg-gray-900/[0.02] dark:hover:bg-white/[0.03]"
+                  >
                     <td className="px-6 py-2.5 whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {formatDateTime(entry.timestamp)}
                     </td>
@@ -276,7 +301,7 @@ function LinkAnalyticsDetail({ linkId }: { linkId: string }) {
           </div>
         )}
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

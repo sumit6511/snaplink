@@ -78,10 +78,10 @@ export function PricingSection({ showHeading = true }: PricingSectionProps) {
               transition={{ duration: 0.4, delay: i * 0.08 }}
             >
               <Card
+                interactive
                 className={cn(
                   'flex h-full flex-col p-8',
-                  plan.featured &&
-                    'border-primary-300 ring-2 ring-primary-500/40 dark:border-primary-500/40',
+                  plan.featured && 'glow-border glow-primary-lg',
                 )}
               >
                 {plan.featured && (

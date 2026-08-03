@@ -20,7 +20,7 @@ export function QrCodeModal({ open, onClose, link }: QrCodeModalProps) {
           <img
             src={link.qrCode}
             alt={`QR code for ${getShortUrlDisplay(link)}`}
-            className="size-56 rounded-xl border border-gray-200 dark:border-gray-800"
+            className="size-56 rounded-xl border border-gray-200/80 dark:border-white/10"
           />
         ) : (
           <div className="flex size-56 items-center justify-center rounded-xl border border-dashed border-gray-300 text-sm text-gray-400 dark:border-gray-700">

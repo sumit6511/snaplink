@@ -22,7 +22,7 @@ export function CopyButton({ value, className }: { value: string; className?: st
       onClick={() => void handleCopy()}
       aria-label="Copy short link"
       className={cn(
-        'flex size-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200',
+        'flex size-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-900/5 hover:text-gray-700 dark:hover:bg-white/10 dark:hover:text-gray-200',
         className,
       )}
     >

@@ -37,18 +37,18 @@ export function Modal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-gray-950/60 backdrop-blur-md"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            initial={{ opacity: 0, scale: 0.95, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             role="dialog"
             aria-modal="true"
             aria-label={title}
             className={cn(
-              'relative w-full rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900',
+              'glass-strong relative w-full rounded-2xl p-6 shadow-2xl shadow-black/20 dark:shadow-black/60',
               maxWidthClassName,
             )}
           >
@@ -58,9 +58,9 @@ export function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="flex size-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                className="flex size-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-900/5 hover:text-gray-600 dark:hover:bg-white/10 dark:hover:text-gray-300"
               >
-                <X className="size-4.5" />
+                <X className="size-4" />
               </button>
             </div>
             <div className="mt-4">{children}</div>

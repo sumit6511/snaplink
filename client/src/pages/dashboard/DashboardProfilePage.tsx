@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/Button';
@@ -43,7 +44,12 @@ export function DashboardProfilePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Your account information.</p>
@@ -51,7 +57,7 @@ export function DashboardProfilePage() {
 
       <Card className="p-8">
         <div className="flex items-center gap-4">
-          <div className="flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-2xl font-semibold text-white">
+          <div className="glow-primary flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-2xl font-semibold text-white">
             {user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div>
@@ -63,7 +69,7 @@ export function DashboardProfilePage() {
         </div>
 
         <form
-          className="mt-8 space-y-4 border-t border-gray-100 pt-6 dark:border-gray-800"
+          className="mt-8 space-y-4 border-t border-gray-900/5 pt-6 dark:border-white/5"
           onSubmit={handleSubmit(onSubmit)}
           noValidate
         >
@@ -89,6 +95,6 @@ export function DashboardProfilePage() {
           </div>
         </form>
       </Card>
-    </div>
+    </motion.div>
   );
 }

@@ -23,7 +23,7 @@ const STEPS = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-gray-50 py-24 dark:bg-gray-900/40">
+    <section id="how-it-works" className="py-24">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
@@ -44,7 +44,7 @@ export function HowItWorks() {
               transition={{ duration: 0.4, delay: i * 0.1 }}
               className="relative text-center"
             >
-              <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-accent-600 text-white shadow-lg shadow-primary-600/20">
+              <div className="glow-primary-lg mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-accent-500 text-white transition-transform duration-300 hover:scale-110">
                 <step.icon className="size-6" />
               </div>
               <span className="mt-4 block text-sm font-semibold text-primary-600 dark:text-primary-400">

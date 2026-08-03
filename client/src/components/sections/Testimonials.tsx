@@ -43,7 +43,7 @@ export function Testimonials() {
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
             >
-              <Card className="flex h-full flex-col p-6">
+              <Card interactive className="flex h-full flex-col p-6">
                 <div className="flex gap-0.5 text-amber-400">
                   {Array.from({ length: 5 }).map((_, idx) => (
                     <Star key={idx} className="size-4 fill-current" />
@@ -53,7 +53,7 @@ export function Testimonials() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="mt-6 flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-sm font-semibold text-white">
+                  <div className="glow-primary flex size-10 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-sm font-semibold text-white">
                     {t.name
                       .split(' ')
                       .map((part) => part[0])

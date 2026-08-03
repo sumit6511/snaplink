@@ -75,8 +75,8 @@ export function Features() {
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <Card className="h-full p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
+              <Card interactive className="h-full p-6">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary-500/10 text-primary-600 ring-1 ring-primary-500/20 dark:text-primary-400">
                   <feature.icon className="size-5" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900 dark:text-white">
@@ -102,9 +102,9 @@ export function Features() {
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
             {ANALYTICS_CARDS.map((item) => (
-              <Card key={item.label} className="p-6">
+              <Card key={item.label} interactive className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-accent-50 text-accent-600 dark:bg-accent-500/10 dark:text-accent-400">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-accent-500/10 text-accent-600 ring-1 ring-accent-500/20 dark:text-accent-400">
                     <item.icon className="size-5" />
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{item.label}</p>

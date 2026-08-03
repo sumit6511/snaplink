@@ -59,7 +59,7 @@ export function AboutPage() {
         <Container>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             {STATS.map((stat) => (
-              <Card key={stat.label} className="p-8 text-center">
+              <Card key={stat.label} interactive className="p-8 text-center">
                 <p className="text-4xl font-bold text-gradient">{stat.value}</p>
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
               </Card>
@@ -68,7 +68,7 @@ export function AboutPage() {
         </Container>
       </section>
 
-      <section className="bg-gray-50 py-24 dark:bg-gray-900/40">
+      <section className="py-24">
         <Container>
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
@@ -78,8 +78,8 @@ export function AboutPage() {
 
           <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((value) => (
-              <Card key={value.title} className="p-6">
-                <div className="flex size-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
+              <Card key={value.title} interactive className="p-6">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary-500/10 text-primary-600 ring-1 ring-primary-500/20 dark:text-primary-400">
                   <value.icon className="size-5" />
                 </div>
                 <h3 className="mt-4 font-semibold text-gray-900 dark:text-white">{value.title}</h3>

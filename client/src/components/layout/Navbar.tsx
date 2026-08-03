@@ -21,7 +21,7 @@ export function Navbar() {
   const isAuthenticated = status === 'authenticated';
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/80 backdrop-blur-lg dark:border-gray-800/70 dark:bg-gray-950/80">
+    <header className="glass-strong sticky top-0 z-50">
       <Container className="flex h-16 items-center justify-between">
         <Logo />
 
@@ -73,7 +73,7 @@ export function Navbar() {
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="flex size-10 items-center justify-center rounded-xl text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 md:hidden"
+          className="flex size-10 items-center justify-center rounded-xl text-gray-600 transition-colors hover:bg-gray-900/5 dark:text-gray-300 dark:hover:bg-white/10 md:hidden"
           aria-label="Toggle menu"
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -87,7 +87,7 @@ export function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden border-t border-gray-200 dark:border-gray-800 md:hidden"
+            className="glass-strong overflow-hidden border-t-0 md:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {NAV_LINKS.map((link) => (
@@ -96,12 +96,12 @@ export function Navbar() {
                   to={link.to}
                   end={link.to === '/'}
                   onClick={() => setOpen(false)}
-                  className="rounded-lg px-3.5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                  className="rounded-lg px-3.5 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-900/5 dark:text-gray-200 dark:hover:bg-white/10"
                 >
                   {link.label}
                 </NavLink>
               ))}
-              <div className="mt-2 flex items-center gap-2 border-t border-gray-200 pt-4 dark:border-gray-800">
+              <div className="mt-2 flex items-center gap-2 border-t border-gray-900/10 pt-4 dark:border-white/10">
                 <ThemeToggle />
                 {isAuthenticated ? (
                   <>

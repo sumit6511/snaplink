@@ -7,11 +7,15 @@ export function CTASection() {
   return (
     <section className="py-24">
       <Container>
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 to-accent-600 px-8 py-16 text-center sm:px-16">
+        <div className="glow-primary-lg animate-gradient-shift relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-accent-600 to-primary-500 bg-[length:200%_200%] px-8 py-16 text-center sm:px-16">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_60%)]"
           />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="bg-orb animate-float -top-16 -left-16 size-64 bg-white/10" />
+            <div className="bg-orb animate-float-slow -right-16 -bottom-16 size-64 bg-white/10" />
+          </div>
           <h2 className="relative text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Start sharing smarter links today
           </h2>

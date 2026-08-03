@@ -8,6 +8,7 @@ import {
   Trash2,
   Upload,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { BulkImportModal } from '@/components/dashboard/BulkImportModal';
@@ -20,7 +21,7 @@ import { Card } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Input } from '@/components/ui/Input';
 import { Pagination } from '@/components/ui/Pagination';
-import { Spinner } from '@/components/ui/Spinner';
+import { ListRowSkeleton } from '@/components/ui/Skeleton';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useDeleteLink, useLinks } from '@/hooks/useLinks';
 import { exportLinksCsvRequest } from '@/services/link.service';
@@ -77,7 +78,12 @@ export function DashboardLinksPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Links</h1>
@@ -125,8 +131,11 @@ export function DashboardLinksPage() {
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-16">
-            <Spinner />
+          <div className="mt-4 divide-y divide-gray-900/5 dark:divide-white/5">
+            <ListRowSkeleton />
+            <ListRowSkeleton />
+            <ListRowSkeleton />
+            <ListRowSkeleton />
           </div>
         ) : isError ? (
           <p className="py-16 text-center text-sm text-red-600 dark:text-red-400">
@@ -151,7 +160,7 @@ export function DashboardLinksPage() {
             <div className="mt-4 -mx-6 hidden overflow-x-auto sm:block">
               <table className="w-full min-w-[640px] text-left text-sm">
                 <thead>
-                  <tr className="border-b border-gray-100 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
+                  <tr className="border-b border-gray-900/5 text-xs tracking-wide text-gray-500 uppercase dark:border-white/5 dark:text-gray-400">
                     <th className="px-6 py-3 font-medium">Link</th>
                     <th className="px-6 py-3 font-medium">Clicks</th>
                     <th className="px-6 py-3 font-medium">Status</th>
@@ -159,9 +168,12 @@ export function DashboardLinksPage() {
                     <th className="px-6 py-3 font-medium">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                <tbody className="divide-y divide-gray-900/5 dark:divide-white/5">
                   {data.links.map((link) => (
-                    <tr key={link.id}>
+                    <tr
+                      key={link.id}
+                      className="transition-colors hover:bg-gray-900/[0.02] dark:hover:bg-white/[0.03]"
+                    >
                       <td className="max-w-xs px-6 py-4">
                         <p className="truncate font-medium text-gray-900 dark:text-white">
                           {link.title || link.originalUrl}
@@ -209,7 +221,7 @@ export function DashboardLinksPage() {
                 table hides its Created column and packs actions off-screen with
                 no scroll affordance, so narrow viewports get a stacked layout
                 instead of a table that requires a hidden horizontal swipe. */}
-            <div className="mt-4 divide-y divide-gray-100 sm:hidden dark:divide-gray-800">
+            <div className="mt-4 divide-y divide-gray-900/5 sm:hidden dark:divide-white/5">
               {data.links.map((link) => (
                 <div key={link.id} className="py-4">
                   <div className="flex items-start justify-between gap-3">
@@ -275,7 +287,7 @@ export function DashboardLinksPage() {
         onConfirm={() => void confirmDelete()}
         onCancel={() => setDeletingLink(null)}
       />
-    </div>
+    </motion.div>
   );
 }
 
@@ -295,7 +307,7 @@ function LinkRowActions({
       <RouterLink
         to={`/dashboard/analytics/${link.id}`}
         aria-label="View analytics"
-        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
       >
         <BarChart3 className="size-4" />
       </RouterLink>
@@ -303,7 +315,7 @@ function LinkRowActions({
         type="button"
         onClick={onShowQr}
         aria-label="Show QR code"
-        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
       >
         <QrCode className="size-4" />
       </button>
@@ -311,7 +323,7 @@ function LinkRowActions({
         type="button"
         onClick={onEdit}
         aria-label="Edit link"
-        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
       >
         <Pencil className="size-4" />
       </button>
@@ -319,7 +331,7 @@ function LinkRowActions({
         type="button"
         onClick={onDelete}
         aria-label="Delete link"
-        className="flex size-8 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+        className="flex size-8 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-red-500/10 hover:text-red-600 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
       >
         <Trash2 className="size-4" />
       </button>

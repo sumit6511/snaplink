@@ -56,7 +56,7 @@ const FOOTER_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
+    <footer className="border-t border-gray-900/5 dark:border-white/5">
       <Container className="py-14">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
           <div className="col-span-2">
@@ -71,7 +71,7 @@ export function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub"
-                className="flex size-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="flex size-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <GithubIcon className="size-4.5" />
               </a>
@@ -80,7 +80,7 @@ export function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Twitter"
-                className="flex size-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="flex size-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <XIcon className="size-4.5" />
               </a>
@@ -89,7 +89,7 @@ export function Footer() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="LinkedIn"
-                className="flex size-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="flex size-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
               >
                 <LinkedinIcon className="size-4.5" />
               </a>
@@ -117,7 +117,7 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-gray-200 pt-8 text-sm text-gray-500 dark:border-gray-800 dark:text-gray-400">
+        <div className="mt-12 border-t border-gray-900/5 pt-8 text-sm text-gray-500 dark:border-white/5 dark:text-gray-400">
           &copy; {new Date().getFullYear()} SnapLink. All rights reserved.
         </div>
       </Container>

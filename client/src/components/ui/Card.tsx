@@ -2,15 +2,18 @@ import type { HTMLAttributes } from 'react';
 import { cn } from '@/utils/cn';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  glass?: boolean;
+  /** Lifts and glows on hover — for cards that are themselves interactive
+   * (clickable rows, feature tiles), not for static content containers. */
+  interactive?: boolean;
 }
 
-export function Card({ className, glass, ...props }: CardProps) {
+export function Card({ className, interactive, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-gray-200/80 bg-white shadow-sm shadow-gray-900/5 dark:border-gray-800 dark:bg-gray-900',
-        glass && 'glass border-white/40 dark:border-gray-800/60',
+        'glass rounded-2xl shadow-xl shadow-gray-950/5 dark:shadow-black/40',
+        interactive &&
+          'transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary-600/10 dark:hover:shadow-primary-500/10',
         className,
       )}
       {...props}

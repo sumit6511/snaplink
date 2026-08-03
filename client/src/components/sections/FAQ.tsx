@@ -31,7 +31,7 @@ const FAQS = [
 
 export function FAQ() {
   return (
-    <section id="faq" className="bg-gray-50 py-24 dark:bg-gray-900/40">
+    <section id="faq" className="py-24">
       <Container className="max-w-3xl">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
@@ -43,7 +43,7 @@ export function FAQ() {
           {FAQS.map((faq) => (
             <details
               key={faq.question}
-              className="group rounded-2xl border border-gray-200 bg-white p-5 open:shadow-sm dark:border-gray-800 dark:bg-gray-900"
+              className="glass group rounded-2xl p-5 transition-shadow open:shadow-lg open:shadow-primary-600/5"
             >
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-gray-900 marker:content-none dark:text-white">
                 {faq.question}

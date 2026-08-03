@@ -30,9 +30,9 @@ export function DashboardSidebar({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white',
+                'flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-600 transition-all duration-200 hover:translate-x-0.5 hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white',
                 isActive &&
-                  'bg-primary-50 text-primary-700 hover:bg-primary-50 hover:text-primary-700 dark:bg-primary-500/10 dark:text-primary-400 dark:hover:bg-primary-500/10 dark:hover:text-primary-400',
+                  'bg-primary-500/10 text-primary-700 ring-1 ring-primary-500/20 hover:translate-x-0 hover:bg-primary-500/10 hover:text-primary-700 dark:text-primary-400 dark:ring-primary-400/20 dark:hover:bg-primary-500/10 dark:hover:text-primary-400',
               )
             }
           >
@@ -42,9 +42,9 @@ export function DashboardSidebar({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      <div className="border-t border-gray-200 p-4 dark:border-gray-800">
+      <div className="border-t border-gray-900/5 p-4 dark:border-white/5">
         <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-sm font-semibold text-white">
+          <div className="glow-primary flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-sm font-semibold text-white">
             {user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div className="min-w-0 flex-1">
@@ -57,7 +57,7 @@ export function DashboardSidebar({ onNavigate }: { onNavigate?: () => void }) {
         <button
           type="button"
           onClick={() => void logout()}
-          className="mt-2 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+          className="mt-2 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-900/5 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white"
         >
           <LogOut className="size-4.5" />
           Log out

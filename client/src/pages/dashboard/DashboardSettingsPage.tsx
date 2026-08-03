@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -17,7 +18,12 @@ export function DashboardSettingsPage() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+    >
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -38,8 +44,8 @@ export function DashboardSettingsPage() {
             className={cn(
               'flex flex-1 items-center gap-3 rounded-xl border p-4 text-left transition-colors',
               theme === 'light'
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
-                : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/60',
+                ? 'border-primary-500 bg-primary-500/10 ring-1 ring-primary-500/20'
+                : 'border-gray-200/80 hover:bg-gray-900/[0.02] dark:border-white/10 dark:hover:bg-white/5',
             )}
           >
             <Sun className="size-5 text-gray-700 dark:text-gray-300" />
@@ -55,8 +61,8 @@ export function DashboardSettingsPage() {
             className={cn(
               'flex flex-1 items-center gap-3 rounded-xl border p-4 text-left transition-colors',
               theme === 'dark'
-                ? 'border-primary-500 bg-primary-50 dark:bg-primary-500/10'
-                : 'border-gray-200 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800/60',
+                ? 'border-primary-500 bg-primary-500/10 ring-1 ring-primary-500/20'
+                : 'border-gray-200/80 hover:bg-gray-900/[0.02] dark:border-white/10 dark:hover:bg-white/5',
             )}
           >
             <Moon className="size-5 text-gray-700 dark:text-gray-300" />
@@ -83,7 +89,7 @@ export function DashboardSettingsPage() {
         </p>
         <ChangePasswordForm />
       </Card>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
@@ -11,15 +12,21 @@ interface AuthLayoutProps {
 
 export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 px-4 py-12 dark:bg-gray-950">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 -top-40 -z-10 flex justify-center blur-3xl"
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="aspect-[1.2/1] w-[50rem] bg-gradient-to-tr from-primary-300 via-accent-200 to-primary-100 opacity-40 dark:opacity-20" />
+        <div className="bg-orb animate-float-slow -top-20 -left-20 size-72 bg-primary-400/20 dark:bg-primary-500/25" />
+        <div className="bg-orb animate-float top-1/3 -right-24 size-80 bg-accent-400/15 dark:bg-accent-500/25" />
       </div>
 
-      <div className="w-full max-w-md">
+      <motion.div
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md"
+      >
         <div className="mb-8 flex justify-center">
           <Logo />
         </div>
@@ -36,7 +43,7 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
             &larr; Back to home
           </Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

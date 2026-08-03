@@ -30,6 +30,12 @@
   --color-accent-900: var(--color-violet-900);
 
   --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 11s ease-in-out infinite;
+  --animate-glow-pulse: glow-pulse 4s ease-in-out infinite;
+  --animate-gradient-shift: gradient-shift 10s ease infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-scale-in: scale-in 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes fade-in {
     from {
@@ -39,6 +45,56 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+    50% {
+      transform: translateY(-24px) translateX(10px);
+    }
+  }
+
+  @keyframes glow-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes gradient-shift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: -200% 0;
+    }
+    to {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
   }
 }
@@ -54,8 +110,26 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 antialiased dark:bg-gray-950 dark:text-gray-100;
+    @apply text-gray-900 antialiased dark:text-gray-100;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    /* Ambient gradient mesh, fixed for the life of the page but not
+       background-attachment:fixed (that repaints on every scroll frame on
+       mobile Safari) — a large layered radial-gradient painted once behind
+       the scrolling content is what everything glass shows through. */
+    background-color: #f6f7fb;
+    background-image:
+      radial-gradient(ellipse 70% 45% at 15% -10%, rgb(99 102 241 / 16%), transparent),
+      radial-gradient(ellipse 55% 40% at 100% 0%, rgb(168 85 247 / 12%), transparent),
+      radial-gradient(ellipse 50% 35% at 50% 100%, rgb(56 189 248 / 8%), transparent);
+    background-repeat: no-repeat;
+  }
+
+  html[data-theme='dark'] body {
+    background-color: #05060d;
+    background-image:
+      radial-gradient(ellipse 70% 45% at 15% -10%, rgb(99 102 241 / 30%), transparent),
+      radial-gradient(ellipse 55% 40% at 100% 0%, rgb(168 85 247 / 24%), transparent),
+      radial-gradient(ellipse 50% 35% at 50% 100%, rgb(56 189 248 / 14%), transparent);
   }
 
   ::selection {
@@ -64,11 +138,89 @@
 }
 
 @layer utilities {
+  /* The default surface treatment app-wide: frosted, translucent, soft
+     border. Replaces the old flat white/solid-gray card. */
   .glass {
-    @apply bg-white/70 backdrop-blur-xl dark:bg-gray-900/60;
+    @apply border border-white/60 bg-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.055];
+  }
+
+  /* Stronger/less transparent — for chrome that sits over scrolling content
+     (nav, sidebar) and needs to stay legible rather than painterly. */
+  .glass-strong {
+    @apply border border-white/70 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-gray-950/70;
   }
 
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-500 via-accent-500 to-primary-400 bg-clip-text text-transparent;
+  }
+
+  .glow-primary {
+    box-shadow:
+      0 0 0 1px rgb(99 102 241 / 15%),
+      0 8px 30px -8px rgb(99 102 241 / 45%);
+  }
+
+  .glow-primary-lg {
+    box-shadow:
+      0 0 0 1px rgb(99 102 241 / 20%),
+      0 20px 60px -12px rgb(99 102 241 / 55%);
+  }
+
+  .glow-border {
+    @apply relative;
+  }
+  .glow-border::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      120deg,
+      var(--color-primary-500),
+      var(--color-accent-500),
+      var(--color-primary-500)
+    );
+    background-size: 200% 200%;
+    animation: var(--animate-gradient-shift);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+  }
+
+  /* Floating ambient orbs used behind hero/auth content. */
+  .bg-orb {
+    @apply pointer-events-none absolute rounded-full blur-3xl;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-gray-200/70 dark:bg-white/[0.06];
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+  html[data-theme='dark'] .skeleton::after {
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 8%), transparent);
+    background-size: 200% 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

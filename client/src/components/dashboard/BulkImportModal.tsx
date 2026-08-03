@@ -79,7 +79,7 @@ function BulkImportForm({ onClose }: { onClose: () => void }) {
       {formError && <p className="text-sm text-red-600 dark:text-red-400">{formError}</p>}
 
       {result && (
-        <div className="rounded-xl border border-gray-200 p-3 text-sm dark:border-gray-800">
+        <div className="rounded-xl border border-gray-200/80 p-3 text-sm dark:border-white/10">
           <p className="text-green-600 dark:text-green-400">
             Imported {result.created.length} link{result.created.length === 1 ? '' : 's'}.
           </p>
