@@ -117,7 +117,7 @@ export function DashboardHomePage() {
               {recent.links.map((link) => (
                 <div
                   key={link.id}
-                  className="flex items-center justify-between gap-4 rounded-lg py-3 transition-colors hover:bg-gray-900/[0.02] dark:hover:bg-white/[0.03]"
+                  className="-mx-3 flex items-center justify-between gap-4 rounded-lg px-3 py-3 transition-colors hover:bg-gray-900/[0.02] dark:hover:bg-white/[0.03]"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
