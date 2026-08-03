@@ -47,6 +47,12 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="pricing" element={<PricingPage />} />
+        {/* Nested here (rather than a bare top-level "*") so an unmatched
+            URL still gets the navbar/footer instead of landing on a blank
+            shell — including under /dashboard/*, since there's no way to
+            know which dashboard nav to render for a route that doesn't
+            exist. */}
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
 
       <Route element={<GuestRoute />}>
@@ -113,8 +119,6 @@ function App() {
           />
         </Route>
       </Route>
-
-      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
