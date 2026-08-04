@@ -135,6 +135,17 @@
   ::selection {
     @apply bg-primary-200 text-primary-900 dark:bg-primary-800 dark:text-primary-50;
   }
+
+  /* Unlike <a>, native <button> elements don't get a pointer cursor in any
+     browser by default — every button in the app (and there are dozens:
+     icon buttons, table actions, modal triggers, the theme radio-cards)
+     was showing the plain arrow cursor on hover instead of looking
+     clickable. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {
